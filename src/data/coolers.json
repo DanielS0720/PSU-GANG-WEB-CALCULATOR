@@ -1,0 +1,29 @@
+[
+  { "id": "air-tower-single", "label": "Torre simple", "type": "air", "w": 1.88 },
+  { "id": "air-tower-single-rgb", "label": "Torre simple RGB", "type": "air", "w": 3.44 },
+  { "id": "air-tower-double", "label": "Torre doble", "type": "air", "w": 3.76 },
+  { "id": "air-tower-double-rgb", "label": "Torre doble RGB", "type": "air", "w": 6.88 },
+
+  { "id": "aio-120", "label": "AIO 120mm", "type": "aio", "w": null },
+  { "id": "aio-120-rgb", "label": "AIO 120mm RGB", "type": "aio", "w": null },
+
+  { "id": "aio-240", "label": "AIO 240mm", "type": "aio", "w": null },
+  { "id": "aio-240-rgb", "label": "AIO 240mm RGB", "type": "aio", "w": null },
+  { "id": "aio-240-screen", "label": "AIO 240mm con pantalla", "type": "aio", "w": null },
+  { "id": "aio-240-screen-rgb", "label": "AIO 240mm RGB con pantalla", "type": "aio", "w": null },
+
+  { "id": "aio-280", "label": "AIO 280mm", "type": "aio", "w": null },
+  { "id": "aio-280-rgb", "label": "AIO 280mm RGB", "type": "aio", "w": null },
+  { "id": "aio-280-screen", "label": "AIO 280mm con pantalla", "type": "aio", "w": null },
+  { "id": "aio-280-screen-rgb", "label": "AIO 280mm RGB con pantalla", "type": "aio", "w": null },
+
+  { "id": "aio-360", "label": "AIO 360mm", "type": "aio", "w": null },
+  { "id": "aio-360-rgb", "label": "AIO 360mm RGB", "type": "aio", "w": null },
+  { "id": "aio-360-screen", "label": "AIO 360mm con pantalla", "type": "aio", "w": null },
+  { "id": "aio-360-screen-rgb", "label": "AIO 360mm RGB con pantalla", "type": "aio", "w": null },
+
+  { "id": "aio-420", "label": "AIO 420mm", "type": "aio", "w": null },
+  { "id": "aio-420-rgb", "label": "AIO 420mm RGB", "type": "aio", "w": null },
+  { "id": "aio-420-screen", "label": "AIO 420mm con pantalla", "type": "aio", "w": null },
+  { "id": "aio-420-screen-rgb", "label": "AIO 420mm RGB con pantalla", "type": "aio", "w": null }
+]

@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+/* PSU Gang design tokens — single source of truth.
+   Keep in sync with .claude/psu-gang-design-skill.md */
+@theme {
+  --color-bg: #000000;
+  --color-surface: #303030;
+  --color-accent: #03d6b3;
+  --color-text: #ffffff;
+  --color-muted: #888888;
+}
+
+/* Map next/font CSS variables (set in layout.tsx) to Tailwind font utilities. */
+@theme inline {
+  --font-mono: var(--font-plex-mono);
+  --font-sans: var(--font-plex-sans);
+}
+
+html,
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+body {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-mono), ui-monospace, monospace;
+}

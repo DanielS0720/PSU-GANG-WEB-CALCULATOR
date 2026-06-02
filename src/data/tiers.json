@@ -1,0 +1,13 @@
+[
+  { "id": "tier-x", "label": "Tier X", "image": "/tiers/tier-x.webp", "max_cpu_w": null, "max_gpu_w": null },
+  { "id": "tier-s-plus", "label": "Tier S+", "image": "/tiers/tier-s-plus.webp", "max_cpu_w": null, "max_gpu_w": null },
+  { "id": "tier-s", "label": "Tier S", "image": "/tiers/tier-s.webp", "max_cpu_w": null, "max_gpu_w": null },
+  { "id": "tier-a", "label": "Tier A", "image": "/tiers/tier-a.webp", "max_cpu_w": null, "max_gpu_w": null },
+  { "id": "tier-b-plus", "label": "Tier B+", "image": "/tiers/tier-b-plus.webp", "max_cpu_w": 370, "max_gpu_w": 530 },
+  { "id": "tier-b", "label": "Tier B", "image": "/tiers/tier-b.webp", "max_cpu_w": 250, "max_gpu_w": 460 },
+  { "id": "tier-c-plus", "label": "Tier C+", "image": "/tiers/tier-c-plus.webp", "max_cpu_w": 155, "max_gpu_w": 370 },
+  { "id": "tier-c", "label": "Tier C", "image": "/tiers/tier-c.webp", "max_cpu_w": 155, "max_gpu_w": 260 },
+  { "id": "tier-d", "label": "Tier D", "image": "/tiers/tier-d.webp", "max_cpu_w": 140, "max_gpu_w": 240 },
+  { "id": "tier-e", "label": "Tier E", "image": "/tiers/tier-e.webp", "max_cpu_w": 140, "max_gpu_w": 75 },
+  { "id": "tier-f", "label": "Tier F", "image": "/tiers/tier-f.webp", "max_cpu_w": 60, "max_gpu_w": 0 }
+]

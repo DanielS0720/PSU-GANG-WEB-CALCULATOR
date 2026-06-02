@@ -1,0 +1,44 @@
+[
+{
+    "id": "z890",
+    "label": "Intel Z890",
+    "chipset": "Z890",
+    "socket": "LGA1851",
+    "avg_w": 50
+  },
+    {
+    "id": "b860",
+    "label": "Intel B860",
+    "chipset": "B860",
+    "socket": "LGA1851",
+    "avg_w": 46
+  },
+  {
+    "id": "z790",
+    "label": "Intel Z790",
+    "chipset": "Z790",
+    "socket": "LGA1700",
+    "avg_w": 46
+  },
+  {
+    "id": "b660",
+    "label": "Intel B660",
+    "chipset": "B660",
+    "socket": "LGA1700",
+    "avg_w": 40
+  },
+  {
+    "id": "x670e",
+    "label": "AMD X670E",
+    "chipset": "X670E",
+    "socket": "AM5",
+    "avg_w": 37
+  },
+  {
+    "id": "b650e",
+    "label": "AMD B650E",
+    "chipset": "B650E",
+    "socket": "AM5",
+    "avg_w": 30
+  }
+]
