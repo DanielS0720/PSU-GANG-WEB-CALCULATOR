@@ -16,7 +16,7 @@ hard-coded hexes in components.
 
 | Token              | Value     | Use                                   |
 | ------------------ | --------- | ------------------------------------- |
-| `--color-bg`       | `#000000` | Base background                       |
+| `--color-bg`       | `#141414` | Base background                       |
 | `--color-surface`  | `#303030` | Cards, selects, inputs                |
 | `--color-accent`   | `#03D6B3` | CTAs, highlights, active borders      |
 | `--color-text`     | `#FFFFFF` | Primary text                          |

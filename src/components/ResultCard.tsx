@@ -21,22 +21,33 @@ export function ResultCard({ result }: ResultCardProps) {
     );
   }
 
-  const { baseWatts, totalWatts, tier } = result;
+  const { baseWatts, totalWatts, recommendedPsu, tier } = result;
   const extraWatts = totalWatts - baseWatts;
 
   return (
     <div className="rounded-lg border border-[var(--color-surface)] bg-[var(--color-surface)] p-6 text-center sticky top-6">
       <span className="block text-xs uppercase tracking-widest text-[var(--color-muted)] mb-3">
-        Potencia recomendada
+        Fuente recomendada
       </span>
       <div className="font-mono text-4xl font-semibold text-[var(--color-accent)]">
-        {totalWatts} W
+        {recommendedPsu ? `${recommendedPsu.w} W` : "> 5200 W"}
       </div>
-      {extraWatts > 0 && (
-        <p className="mt-2 font-mono text-xs text-[var(--color-muted)]">
-          {baseWatts} W base + {extraWatts} W extras
+
+      {recommendedPsu?.requires_220v && (
+        <p className="mt-2 font-mono text-xs text-yellow-400">
+          ⚡ Requiere instalación 220V / 230V
         </p>
       )}
+      {!recommendedPsu && (
+        <p className="mt-2 font-mono text-xs text-yellow-400">
+          El consumo supera el estándar más alto (5200W)
+        </p>
+      )}
+
+      <p className="mt-3 font-mono text-xs text-[var(--color-muted)]">
+        Consumo calculado: {totalWatts} W
+        {extraWatts > 0 && ` (${baseWatts} W base + ${extraWatts} W extras)`}
+      </p>
 
       <div className="mt-6">
         {tier ? (

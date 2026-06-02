@@ -31,6 +31,10 @@ export interface Gpu {
 export interface Motherboard {
   id: string;
   label: string;
+  /** Chipset name, e.g. "Z890". */
+  chipset?: string;
+  /** CPU socket this board uses, e.g. "LGA1851". Filters by selected CPU. */
+  socket: string;
   /** Average board consumption in watts. */
   avg_w: number;
 }
@@ -49,6 +53,13 @@ export interface Cooler {
   type: "air" | "aio";
   /** Consumption in watts. `null` until the value is supplied; counts as 0W. */
   w: number | null;
+}
+
+/** A standard PSU wattage step. */
+export interface PsuStandard {
+  w: number;
+  /** True for high-wattage units that need a 220V/230V install. */
+  requires_220v: boolean;
 }
 
 export interface Tier {

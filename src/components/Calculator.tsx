@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type {
   Cpu,
   Gpu,
@@ -37,10 +37,6 @@ const gpuOptions: SelectOption[] = gpus.map((g) => ({
   value: g.id,
   label: `${g.brand} ${g.model}`,
 }));
-const moboOptions: SelectOption[] = motherboards.map((m) => ({
-  value: m.id,
-  label: m.label,
-}));
 const fanOptions: SelectOption[] = fans.map((f) => ({
   value: f.id,
   label: f.label,
@@ -73,6 +69,29 @@ export function Calculator() {
     setSelection((prev) => ({ ...prev, ...changes }));
     setResult(null);
     setError(null);
+  }
+
+  // --- Socket-based motherboard filter --------------------------------------
+  // Selected CPU's socket. `null` when no CPU is chosen or the CPU's socket is
+  // unknown in the dataset — in that case no filter is applied (show all).
+  const cpuSocket =
+    cpus.find((c) => c.id === selection.cpuId)?.socket ?? null;
+
+  const moboOptions = useMemo<SelectOption[]>(
+    () =>
+      motherboards
+        .filter((m) => cpuSocket === null || m.socket === cpuSocket)
+        .map((m) => ({ value: m.id, label: m.label })),
+    [cpuSocket],
+  );
+
+  // Changing the CPU clears the selected motherboard if its socket no longer
+  // matches, so a hidden incompatible board can't leak into the calculation.
+  function handleCpuChange(cpuId: string | null) {
+    const cpu = cpus.find((c) => c.id === cpuId);
+    const mobo = motherboards.find((m) => m.id === selection.motherboardId);
+    const keepMobo = !cpu?.socket || !mobo || mobo.socket === cpu.socket;
+    patch({ cpuId, motherboardId: keepMobo ? selection.motherboardId : null });
   }
 
   // --- GPU rows -------------------------------------------------------------
@@ -114,8 +133,12 @@ export function Calculator() {
 
   function handleCalculate() {
     const hasGpu = selection.gpuIds.some((id) => id !== null);
-    if (selection.cpuId === null || !hasGpu) {
-      setError("Selecciona al menos CPU y una GPU para calcular.");
+    if (
+      selection.cpuId === null ||
+      !hasGpu ||
+      selection.motherboardId === null
+    ) {
+      setError("Selecciona al menos CPU, GPU y motherboard para calcular.");
       setResult(null);
       return;
     }
@@ -133,7 +156,7 @@ export function Calculator() {
           placeholder="Selecciona tu CPU"
           options={cpuOptions}
           value={selection.cpuId}
-          onChange={(cpuId) => patch({ cpuId })}
+          onChange={handleCpuChange}
         />
 
         {/* GPUs — multi-GPU: one row per card */}
@@ -178,7 +201,11 @@ export function Calculator() {
 
         <ComponentSelect
           label="Motherboard"
-          placeholder="Selecciona el chipset"
+          placeholder={
+            cpuSocket
+              ? `Socket ${cpuSocket} — elige chipset`
+              : "Selecciona el chipset"
+          }
           options={moboOptions}
           value={selection.motherboardId}
           onChange={(motherboardId) => patch({ motherboardId })}

@@ -5,6 +5,7 @@ import type {
   Fan,
   Gpu,
   Motherboard,
+  PsuStandard,
   Selection,
   Tier,
   WattMode,
@@ -14,6 +15,7 @@ import gpusData from "@/data/gpus.json";
 import motherboardsData from "@/data/motherboards.json";
 import fansData from "@/data/fans.json";
 import coolersData from "@/data/coolers.json";
+import psusData from "@/data/psus.json";
 import tiersData from "@/data/tiers.json";
 
 const cpus = cpusData as Cpu[];
@@ -21,18 +23,36 @@ const gpus = gpusData as Gpu[];
 const motherboards = motherboardsData as Motherboard[];
 const fans = fansData as Fan[];
 const coolers = coolersData as Cooler[];
+const psus = psusData as PsuStandard[];
 const tiers = tiersData as Tier[];
 
 /** Extra watts added per enabled option (overclock, future proof). */
 export const OPTION_WATTS = 100;
 
+/**
+ * Tolerance allowed when stepping down to a standard PSU: a build can use a
+ * standard whose wattage is within 5% below the build's draw.
+ */
+export const PSU_TOLERANCE = 1.05;
+
 export interface CalculationResult {
   /** Base draw of the build (no overclock / future-proof extras). */
   baseWatts: number;
-  /** Recommended PSU wattage — base draw plus enabled extras. */
+  /** Total build draw — base draw plus enabled extras (the raw sum shown). */
   totalWatts: number;
+  /** Recommended standard PSU. `null` when the draw exceeds the top step. */
+  recommendedPsu: PsuStandard | null;
   /** Tier from the CPU + GPU load. Extras never change the tier. */
   tier: Tier | null;
+}
+
+/**
+ * Lowest standard PSU that covers `totalWatts` within the 5% tolerance, i.e.
+ * the first step (ascending) where `totalWatts <= step.w * 1.05`. Returns
+ * `null` when the draw exceeds even the largest step plus tolerance.
+ */
+export function recommendPsu(totalWatts: number): PsuStandard | null {
+  return psus.find((psu) => totalWatts <= psu.w * PSU_TOLERANCE) ?? null;
 }
 
 /** Maps the ATX standard to which watt field of a component to use. */
@@ -128,5 +148,10 @@ export function calculate(selection: Selection): CalculationResult {
 
   // Tier is driven by CPU + GPU load only (per ATX mode), never by the
   // recommended wattage or the overclock / future-proof extras.
-  return { baseWatts, totalWatts, tier: tierForLoads(cpuWatts, gpuWatts) };
+  return {
+    baseWatts,
+    totalWatts,
+    recommendedPsu: recommendPsu(totalWatts),
+    tier: tierForLoads(cpuWatts, gpuWatts),
+  };
 }

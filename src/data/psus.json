@@ -1,0 +1,16 @@
+[
+  { "w": 450, "requires_220v": false },
+  { "w": 550, "requires_220v": false },
+  { "w": 650, "requires_220v": false },
+  { "w": 750, "requires_220v": false },
+  { "w": 850, "requires_220v": false },
+  { "w": 1000, "requires_220v": false },
+  { "w": 1200, "requires_220v": false },
+  { "w": 1300, "requires_220v": false },
+  { "w": 1500, "requires_220v": false },
+  { "w": 1600, "requires_220v": false },
+  { "w": 2000, "requires_220v": true },
+  { "w": 2200, "requires_220v": true },
+  { "w": 3000, "requires_220v": true },
+  { "w": 5200, "requires_220v": true }
+]

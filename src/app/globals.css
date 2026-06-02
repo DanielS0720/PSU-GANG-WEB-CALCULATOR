@@ -3,7 +3,7 @@
 /* PSU Gang design tokens — single source of truth.
    Keep in sync with .claude/psu-gang-design-skill.md */
 @theme {
-  --color-bg: #000000;
+  --color-bg: #141414;
   --color-surface: #303030;
   --color-accent: #03d6b3;
   --color-text: #ffffff;

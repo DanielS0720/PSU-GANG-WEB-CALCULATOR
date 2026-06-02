@@ -218,7 +218,17 @@ psu-gang-calculator/
   }
 ]
 ```
-> `null` en `max_cpu_w` / `max_gpu_w` = sin restricción (infinite). El tier recomendado es el **más bajo** (peor tier) cuyo `max_cpu_w ≥ cpu.peak_w` y `max_gpu_w ≥ gpu.peak_w`. Los tiers están ordenados de mejor a peor; el algoritmo recorre la lista al revés y devuelve el primero que no viola ningún límite.
+> `null` en `max_cpu_w` / `max_gpu_w` = sin restricción (infinite). El tier recomendado es el **más bajo** (peor tier) cuyo `max_cpu_w ≥ cpuLoad` y `max_gpu_w ≥ gpuLoad` (carga sumada multi-GPU). Los tiers están ordenados de mejor a peor; el algoritmo recorre la lista al revés y devuelve el primero que no viola ningún límite.
+
+### `psus.json`
+```json
+[
+  { "w": 450,  "requires_220v": false },
+  { "w": 1600, "requires_220v": false },
+  { "w": 2000, "requires_220v": true }
+]
+```
+> Escalones de fuente estándar en orden ascendente. `requires_220v: true` = la unidad exige instalación 220V/230V. Usado por `recommendPsu` (Paso 4): primer escalón donde `consumoTotal ≤ w × 1.05`.
 
 ---
 
@@ -227,34 +237,34 @@ psu-gang-calculator/
 ### Paso 1 — Determinar los valores de consumo según estándar ATX
 
 ```
-if (atx === "2.52") {        // ATX 2.52 o inferior → pico transitorio
-  cpuLoad = cpu.peak_w
-  gpuLoad = gpu.peak_w
-} else {                      // ATX 3.x → TDP / power excursion cubierta
-  cpuLoad = cpu.tdp_w
-  gpuLoad = gpu.tdp_w
-}
+field = (atx === "2.52") ? "peak_w" : "tdp_w"   // 2.52 → pico transitorio; 3.x → TDP
+
+cpuLoad = cpu[field]
+gpuLoad = Σ gpu[field]   // multi-GPU: suma de TODAS las GPUs seleccionadas
 ```
 
 > El estándar ATX seleccionado determina **qué valor del dataset** alimenta la asignación de tier:
 > - **ATX 2.52 o inferior**: `peak_w` (la fuente debe soportar el pico transitorio completo).
 > - **ATX 3.x**: `tdp_w` (la especificación ATX 3.x ya cubre el power excursion sobre el TDP nominal).
+> - **Multi-GPU**: `gpuLoad` es la **suma** de la carga de todas las GPUs (no la mayor individual). Con 2+ GPUs casi siempre cae en Tier A/X.
 
-### Paso 2 — Watts recomendados de la fuente (sí afectan las opciones extra)
+### Paso 2 — Consumo total calculado (sí lo afectan las opciones extra)
 
 ```
-wattsBase = cpuLoad + gpuLoad + motherboard.avg_w + (Σ fans.w_per_unit)
+consumoBase  = cpuLoad + gpuLoad + motherboard.avg_w + cooler.w + Σ (fan.w_per_unit × count)
 
-wattsRecomendados = wattsBase
-if overclock:    wattsRecomendados += 100
-if future_proof: wattsRecomendados += 100
+consumoTotal = consumoBase
+if overclock:    consumoTotal += 100
+if future_proof: consumoTotal += 100
 ```
 
-> Overclock y future proof **solo modifican `wattsRecomendados`** (la potencia en W de la fuente), **NO** el tier asignado.
-> El tier sale del Paso 3 usando `cpuLoad` / `gpuLoad` del Paso 1 — sin los +100W.
+> `consumoTotal` es la **suma cruda** que se muestra como "Consumo calculado". La **fuente recomendada** (un escalón estándar) se deriva de él en el Paso 4.
+> - **Disipador (`cooler.w`)**: suma al consumo; `null` (valor aún no provisto) cuenta como 0W. **NO** afecta el tier.
+> - **Ventiladores**: una fila por tipo, cada fila aporta `w_per_unit × cantidad`.
+> Overclock y future proof **solo modifican `consumoTotal`**, **NO** el tier asignado.
 > El número de watts y el tier son dos salidas independientes:
 > - **Tier** → calidad/categoría de la fuente (Paso 3, sin OC/FP).
-> - **Watts recomendados** → potencia nominal sugerida (este paso, con OC/FP si están marcados).
+> - **Consumo / fuente recomendada** → potencia sugerida (Pasos 2 y 4, con OC/FP si están marcados).
 
 ### Paso 3 — Encontrar el tier mínimo que soporte ambas cargas
 
@@ -262,7 +272,7 @@ if future_proof: wattsRecomendados += 100
 tierRecomendado = el tier con el ID más bajo (peor calidad) tal que:
   (tier.max_cpu_w === null  O  tier.max_cpu_w >= cpuLoad)
   Y
-  (tier.max_gpu_w === null  O  tier.max_gpu_w >= gpuLoad)
+  (tier.max_gpu_w === null  O  tier.max_gpu_w >= gpuLoad)   // gpuLoad = suma multi-GPU
 ```
 
 El algoritmo recorre `tiers.json` **de peor a mejor** (Tier F → Tier X) y devuelve el primer tier que no viola ningún límite. Esto garantiza el tier mínimo recomendado.
@@ -284,6 +294,29 @@ El algoritmo recorre `tiers.json` **de peor a mejor** (Tier F → Tier X) y devu
 | F    | 60W             | 0W              |
 
 > Sin margen de seguridad adicional (ya contemplado en los valores del dataset).
+
+### Paso 4 — Fuente recomendada (escalones estándar + tolerancia 5%)
+
+El `consumoTotal` (Paso 2) se redondea al escalón de fuente real más sensato. Las fuentes existen solo en wattajes estándar:
+
+- **110V (estándar):** 450, 550, 650, 750, 850, 1000, 1200, 1300, 1500, 1600
+- **220V/230V (alto voltaje):** 2000, 2200, 3000, 5200 → marcadas `requires_220v: true`
+
+```
+PSU_TOLERANCE = 1.05
+
+fuenteRecomendada = primer escalón S (ascendente) tal que:
+  consumoTotal <= S.w × 1.05
+```
+
+> La tolerancia del 5% permite **bajar al escalón anterior** cuando el consumo no supera el 105% de ese escalón.
+> Aplica en **toda** la escalera, incluido el cruce 110V → 220V.
+>
+> **Ejemplos:** 570W → 550W (570 ≤ 577.5) · 580W → 650W · 1290W → 1300W · 1650W → 1600W · 1700W → 2000W (220V) · 2310W → 2200W (220V).
+>
+> **Borde:** si `consumoTotal` supera 5200 × 1.05 = 5460W, no hay escalón → `recommendPsu` devuelve `null` y la tarjeta muestra "> 5200 W" + aviso de exceso.
+>
+> **Display:** la fuente recomendada es el número **protagonista** (grande); `consumoTotal` se muestra pequeño como "Consumo calculado". Si el escalón elegido es `requires_220v`, se muestra el aviso ⚡ "Requiere instalación 220V/230V". La fuente recomendada es **independiente del tier**.
 
 ---
 
