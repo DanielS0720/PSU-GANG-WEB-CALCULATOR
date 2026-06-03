@@ -9,7 +9,7 @@
   {"id": "core-i5-14400", "brand": "Intel", "family": "Raptor Lake Refresh", "model": "Core i5-14400", "socket": "LGA 1700", "tdp_w": 148, "peak_w": 130.0},
   {"id": "core-i3-14100", "brand": "Intel", "family": "Raptor Lake Refresh", "model": "Core i3-14100", "socket": "LGA 1700", "tdp_w": 110, "peak_w": 66.0},
   {"id": "core-i9-13900ks", "brand": "Intel", "family": "Raptor Lake", "model": "Core i9-13900KS", "socket": "LGA 1700", "tdp_w": 253, "peak_w": 500.0},
-  {"id": "core-i9-13900k", "brand": "Intel", "family": "Raptor Lake", "model": "Core i9-13900K", "socket": "LGA 17000", "tdp_w": 253, "peak_w": 469.3},
+  {"id": "core-i9-13900k", "brand": "Intel", "family": "Raptor Lake", "model": "Core i9-13900K", "socket": "LGA 1700", "tdp_w": 253, "peak_w": 469.3},
   {"id": "core-i7-13700k", "brand": "Intel", "family": "Raptor Lake", "model": "Core i7-13700K", "socket": "LGA 1700", "tdp_w": 253, "peak_w": 279.6},
   {"id": "core-i5-13600k", "brand": "Intel", "family": "Raptor Lake", "model": "Core i5-13600K", "socket": "LGA 1700", "tdp_w": 181, "peak_w": 187.0},
   {"id": "core-i5-13400", "brand": "Intel", "family": "Raptor Lake", "model": "Core i5-13400", "socket": "LGA 1700", "tdp_w": 148, "peak_w": 140.0},
