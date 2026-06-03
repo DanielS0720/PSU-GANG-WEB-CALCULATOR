@@ -23,6 +23,9 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Cloudflare Pages no soporta el optimizador de imágenes de Next (/_next/image).
+  // Servir los logos PNG tal cual.
+  images: { unoptimized: true },
   async headers() {
     return [
       {
