@@ -1,4 +1,7 @@
 name = "psugangcalculator"
 compatibility_date = "2024-09-23"
-compatibility_flags = ["nodejs_compat"]
-pages_build_output_dir = ".vercel/output/static"
+
+# Sitio estático (next build con output: "export" -> ./out).
+# Se despliega como Workers static assets: wrangler deploy.
+[assets]
+directory = "./out"

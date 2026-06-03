@@ -5,6 +5,8 @@ import { SITE_DESCRIPTION } from "@/lib/site";
 export const alt = "PSU Gang — Watt Calculator";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
+// Necesario con output: "export" — prerenderiza la imagen en build.
+export const dynamic = "force-static";
 
 export default function OpenGraphImage() {
   return new ImageResponse(
