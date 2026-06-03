@@ -1,3 +1,4 @@
+
 # PSU Gang — Watt Calculator
 
 Calculadora de consumo eléctrico para builds de PC gamer. Sitio temporal hasta el lanzamiento de la página oficial de PSU Gang.
@@ -140,20 +141,6 @@ psu-gang-calculator/
 ```json
 [
   {
-    "id": "tier-x",
-    "label": "Tier X",
-    "image": "/tiers/tier-x.webp",
-    "max_cpu_w": null,
-    "max_gpu_w": null
-  },
-  {
-    "id": "tier-s-plus",
-    "label": "Tier S+",
-    "image": "/tiers/tier-s-plus.webp",
-    "max_cpu_w": null,
-    "max_gpu_w": null
-  },
-  {
     "id": "tier-s",
     "label": "Tier S",
     "image": "/tiers/tier-s.webp",
@@ -275,14 +262,12 @@ tierRecomendado = el tier con el ID más bajo (peor calidad) tal que:
   (tier.max_gpu_w === null  O  tier.max_gpu_w >= gpuLoad)   // gpuLoad = suma multi-GPU
 ```
 
-El algoritmo recorre `tiers.json` **de peor a mejor** (Tier F → Tier X) y devuelve el primer tier que no viola ningún límite. Esto garantiza el tier mínimo recomendado.
+El algoritmo recorre `tiers.json` **de peor a mejor** (Tier F → Tier S) y devuelve el primer tier que no viola ningún límite. Esto garantiza el tier mínimo recomendado.
 
 **Referencia de límites por tier:**
 
 | Tier | CPU máx (peak_w) | GPU máx (peak_w) |
 |------|-----------------|-----------------|
-| X    | ∞               | ∞               |
-| S+   | ∞               | ∞               |
 | S    | ∞               | ∞               |
 | A    | ∞               | ∞               |
 | B+   | 370W            | 530W            |
@@ -448,7 +433,7 @@ Si los datos de TDP/picos cambian antes del cierre del sitio:
 ## Entregables Pendientes de Daniel
 
 - [ ] Logo de PSU Gang en formato `.svg` o `.png`/`.webp` con fondo transparente
-- [ ] Imágenes de tier en formato `.webp` (una por tier: `tier-x.webp`, `tier-s-plus.webp`, `tier-s.webp`, `tier-a.webp`, `tier-b-plus.webp`, `tier-b.webp`, `tier-c-plus.webp`, `tier-c.webp`, `tier-d.webp`, `tier-e.webp`, `tier-f.webp`)
+- [ ] Imágenes de tier (una por tier: `tier-s`, `tier-a`, `tier-b-plus`, `tier-b`, `tier-c-plus`, `tier-c`, `tier-d`, `tier-e`, `tier-f`)
 - [ ] Google Sheets con columnas: `model`, `tdp_w`, `peak_w` para CPUs y GPUs
 - [ ] Nombre de dominio elegido en Cloudflare
 - [ ] Confirmar si el selector de motherboard va por chipset genérico o incluye marcas/modelos

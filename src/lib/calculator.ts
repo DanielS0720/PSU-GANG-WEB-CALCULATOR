@@ -87,7 +87,7 @@ function findById<T extends { id: string }>(
 /**
  * Minimum (worst) tier that supports both the CPU and GPU load.
  *
- * `tiers` is ordered best→worst (Tier X … Tier F). We walk it from worst to
+ * `tiers` is ordered best→worst (Tier S … Tier F). We walk it from worst to
  * best and return the first tier that violates neither limit, i.e. the lowest
  * tier whose `max_cpu_w >= cpuLoad` and `max_gpu_w >= gpuLoad`. A `null` limit
  * means "no restriction" (top tiers always fit).
