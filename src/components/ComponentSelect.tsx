@@ -33,7 +33,9 @@ export function ComponentSelect({
         disabled={options.length === 0}
         className="w-full rounded-md border border-[var(--color-surface)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text)] focus:border-[var(--color-accent)] focus:outline-none disabled:opacity-60"
       >
-        <option value="">{placeholder}</option>
+        <option value="" disabled={value !== null} hidden={value !== null}>
+          {placeholder}
+        </option>
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
             {opt.label}

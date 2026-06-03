@@ -18,9 +18,9 @@ Permitir al usuario seleccionar los componentes de su PC (CPU, GPU, motherboard,
 | Frontend | Next.js 15 (App Router) + TypeScript | Mismo stack que Finiix; SSG puro = cero latencia en cálculos |
 | Estilos | Tailwind CSS v4 | Utilidades rápidas, coherencia con PSU Gang design tokens |
 | Datos | JSON estático embebido en el bundle | Exportado una vez desde Google Sheets; sin DB, sin API calls en runtime |
-| Despliegue | Vercel (Hobby tier) | Gratis, CI/CD con `git push`, dominio personalizado de Cloudflare |
-| Dominio | Cloudflare (DNS → Vercel) | Gestión centralizada, sin coste adicional por el proxy |
-| Imágenes tier | Archivos estáticos en `/public/tiers/` | Entregados por Daniel; servidos por Vercel CDN |
+| Despliegue | Cloudflare Workers (static assets) | `wrangler deploy` sirve `./out` (`next build` con `output: "export"`); dominio propio, sin `*.workers.dev` |
+| Dominio | Cloudflare (`psugang.com`, custom domain) | Gestión centralizada DNS + hosting en la misma plataforma |
+| Imágenes tier | Archivos estáticos en `/public/tiers/` | Entregados por Daniel; servidos por el CDN edge de Cloudflare |
 
 > **Sin base de datos.** Los datos viven en archivos `.json` dentro del repositorio. No hay superficie de ataque SQL, no hay credenciales que rotar, no hay latencia de red en los cálculos. Los únicos datos que el usuario "envía" son selecciones locales que nunca salen del navegador.
 
@@ -387,22 +387,31 @@ Esto le permite a Claude Code mantener consistencia visual sin derivar hacia est
 
 ## Despliegue
 
+### Plataforma
+**Cloudflare Workers** (static assets), no Vercel. Config en `wrangler.toml`:
+- `name = "psugangcalculator"`, `workers_dev = false`, `preview_urls = false`
+- `routes = [{ pattern = "psugang.com", custom_domain = true }]`
+- `[assets] directory = "./out"` — sirve el export estático de Next.
+
+Headers de seguridad en `public/_headers` (X-Frame-Options, CSP, etc.).
+
 ### Pasos
 1. `git push` a la rama `main` del repositorio GitHub.
-2. Vercel detecta el push y despliega automáticamente (CI/CD sin configuración manual).
-3. En Cloudflare: agregar un registro `CNAME` apuntando al dominio `.vercel.app` asignado.
-4. En Vercel: añadir el dominio personalizado en el dashboard del proyecto.
+2. `npm run deploy` → genera el build y publica con `wrangler` en Cloudflare.
+3. Dominio `psugang.com` ya enlazado como custom domain en `wrangler.toml`.
+
+> **Nota técnica**: los scripts `package.json` usan `@cloudflare/next-on-pages` + `wrangler pages deploy`, mientras `wrangler.toml` define un deploy de Workers static assets (`./out`). Unificar a un solo mecanismo (Workers assets **o** Pages) es tarea pendiente de la fase de mejoras.
 
 ### Variables de entorno
 Ninguna. El proyecto es completamente estático; no hay secrets, keys ni conexiones a servicios externos.
 
 ### Build
 ```bash
-npm run build   # Genera sitio estático
-npm run start   # Preview local
+npm run build    # next build (output: export → ./out)
+npm run deploy   # build + wrangler deploy a Cloudflare
 ```
 
-Vercel ejecuta `next build` automáticamente. El output es un bundle estático optimizado servido desde el CDN edge de Vercel (~100ms globalmente).
+El output es un bundle estático optimizado servido desde el CDN edge global de Cloudflare.
 
 ---
 
@@ -430,19 +439,32 @@ Si los datos de TDP/picos cambian antes del cierre del sitio:
 
 ---
 
-## Entregables Pendientes de Daniel
+## Entregables de Daniel — ENTREGADOS ✅
 
-- [ ] Logo de PSU Gang en formato `.svg` o `.png`/`.webp` con fondo transparente
-- [ ] Imágenes de tier (una por tier: `tier-s`, `tier-a`, `tier-b-plus`, `tier-b`, `tier-c-plus`, `tier-c`, `tier-d`, `tier-e`, `tier-f`)
-- [ ] Google Sheets con columnas: `model`, `tdp_w`, `peak_w` para CPUs y GPUs
-- [ ] Nombre de dominio elegido en Cloudflare
-- [ ] Confirmar si el selector de motherboard va por chipset genérico o incluye marcas/modelos
+- [x] Logo de PSU Gang — entregado como `.png` con fondo transparente. Servido desde `/public/logo/empresarial-logo.png` (también `capacitor-logo.png` disponible). _Nota: el spec original pedía `.svg`; se usó `.png`._
+- [x] Imágenes de tier — 9 entregadas en `/public/tiers/` como `.png` (`tier-s`, `tier-a`, `tier-b-plus`, `tier-b`, `tier-c-plus`, `tier-c`, `tier-d`, `tier-e`, `tier-f`). _Nota: spec decía `.webp`; se usó `.png`._
+- [x] Datos de CPUs/GPUs (`model`, `tdp_w`, `peak_w`) — cargados en `/src/data/cpus.json` y `gpus.json`.
+- [x] Nombre de dominio — **psugang.com** (gestionado en Cloudflare).
+- [x] Selector de motherboard — resuelto: **por chipset genérico** (`motherboards.json` con `avg_w` por categoría, sin marca específica).
 
 ---
 
-## Lo que NO está definido aún (decisiones abiertas)
+## Decisiones — RESUELTAS ✅
 
-- Overclock/future proof: **resuelto** → cada uno suma +100W a los watts recomendados de la fuente, pero **no** alteran el tier mínimo asignado.
-- ¿El toggle ATX 2.52/3.x tiene texto explicativo (tooltip) para usuarios que no saben cuál tienen?
-- ¿La imagen de tier ocupa toda la pantalla de resultado o es una card compacta?
-- ¿Se muestra algún mensaje cuando el CPU o GPU seleccionado cae en Tier F (GPU con 0W máx)?
+- **Overclock / future proof**: cada uno suma +100W a los watts recomendados de la fuente, pero **no** alteran el tier mínimo asignado.
+- **Imagen de tier**: **card compacta** (`ResultCard` sticky con la imagen dentro de la card, junto a watts y label). No ocupa pantalla completa.
+- **Mensaje Tier F / sin tier**: **sin mensaje especial**. Se muestra solo el label del tier; `"Sin tier asignado"` cuando `tier` es `null`.
+- **Toggle ATX 2.52/3.x — tooltip explicativo**: resuelto en concepto, **pendiente de implementación**. No será un tooltip estático: la idea es una **consulta/lookup** (DB local cargada en el navegador) donde el usuario busca su modelo de fuente y el sitio le indica qué estándar ATX tiene. Pasa a la fase de mejoras (ver abajo).
+
+---
+
+## Fase actual: Corrección de bugs y mejoras
+
+Discrepancias spec ↔ implementación detectadas (para abordar en esta fase):
+
+- **Deploy mixto Workers/Pages**: `wrangler.toml` define Workers static assets (`./out`), pero los scripts `package.json` usan `@cloudflare/next-on-pages` + `wrangler pages deploy`. Unificar a un solo mecanismo.
+- **Flujo UX "cero fricción"**: el spec dice sin botón submit (reactivo con `useEffect`), pero la implementación tiene botón **Calcular** explícito. Decidir cuál es el comportamiento final.
+
+Mejoras planificadas:
+
+- **Lookup de estándar ATX por modelo de fuente**: DB local en navegador, el usuario busca su PSU y obtiene su estándar ATX (reemplaza la idea de tooltip).

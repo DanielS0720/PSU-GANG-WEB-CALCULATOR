@@ -9,7 +9,7 @@ interface ResultCardProps {
 export function ResultCard({ result }: ResultCardProps) {
   if (!result) {
     return (
-      <div className="rounded-lg border border-dashed border-[var(--color-muted)]/40 bg-[var(--color-surface)] p-6 text-center sticky top-6">
+      <div className="rounded-lg border border-dashed border-[var(--color-muted)]/40 bg-[var(--color-surface)] p-6 text-center md:sticky md:top-6">
         <span className="block text-xs uppercase tracking-widest text-[var(--color-muted)] mb-3">
           Potencia recomendada
         </span>
@@ -25,7 +25,7 @@ export function ResultCard({ result }: ResultCardProps) {
   const extraWatts = totalWatts - baseWatts;
 
   return (
-    <div className="rounded-lg border border-[var(--color-surface)] bg-[var(--color-surface)] p-6 text-center sticky top-6">
+    <div className="rounded-lg border border-[var(--color-surface)] bg-[var(--color-surface)] p-6 text-center md:sticky md:top-6">
       <span className="block text-xs uppercase tracking-widest text-[var(--color-muted)] mb-3">
         Fuente recomendada
       </span>
@@ -49,7 +49,7 @@ export function ResultCard({ result }: ResultCardProps) {
         {extraWatts > 0 && ` (${baseWatts} W base + ${extraWatts} W extras)`}
       </p>
 
-      <div className="mt-6">
+      <div className="mt-6 mx-auto w-full max-w-[260px]">
         {tier ? (
           <>
             <TierImage src={tier.image} alt={tier.label} />

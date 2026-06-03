@@ -29,9 +29,9 @@ const coolers = coolersData as Cooler[];
 const BUY_GUIDE_URL =
   "https://docs.google.com/document/d/1iYZZeiiHBoXyctOdptDJ2oFYJ03mYiyT3XrXqXJIIQ8/edit?usp=sharing";
 
-const MAX_FANS = 12;
+const MAX_FANS = 15;
 const MAX_GPUS = 4;
-const MAX_FAN_ROWS = 6;
+const MAX_FAN_ROWS = 3;
 
 const cpuOptions: SelectOption[] = cpus.map((c) => ({
   value: c.id,
