@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
+import { SITE_URL, SITE_NAME, SITE_SHORT_NAME, SITE_DESCRIPTION } from "@/lib/site";
 
 const plexMono = IBM_Plex_Mono({
   subsets: ["latin"],
@@ -17,9 +18,63 @@ const plexSans = IBM_Plex_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "PSU Gang — Watt Calculator",
-  description:
-    "Calculadora de consumo eléctrico para builds de PC gamer. Potencia recomendada de fuente de poder con soporte ATX 2.52 y ATX 3.x.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: SITE_NAME,
+    template: `%s | ${SITE_SHORT_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  authors: [{ name: "PSU Gang" }],
+  creator: "PSU Gang",
+  publisher: "PSU Gang",
+  category: "technology",
+  keywords: [
+    "calculadora fuente de poder",
+    "calculadora PSU",
+    "watts PC",
+    "consumo PC gamer",
+    "fuente de poder recomendada",
+    "PSU calculator",
+    "ATX 3.0",
+    "ATX 3.x",
+    "PSU Gang",
+  ],
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: "es_ES",
+    url: "/",
+    siteName: SITE_NAME,
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: SITE_SHORT_NAME,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#141414",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({

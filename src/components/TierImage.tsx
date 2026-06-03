@@ -15,7 +15,7 @@ export function TierImage({ src, alt }: TierImageProps) {
       width={320}
       height={320}
       className="w-full h-auto rounded-md"
-      priority
+      loading="lazy"
     />
   );
 }

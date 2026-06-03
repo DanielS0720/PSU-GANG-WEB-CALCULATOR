@@ -1,4 +1,40 @@
+import Image from "next/image";
 import { Calculator } from "@/components/Calculator";
+import {
+  SITE_URL,
+  SITE_NAME,
+  SITE_DESCRIPTION,
+  SOCIAL_URLS,
+} from "@/lib/site";
+
+// Structured data — helps search engines render a rich result for the tool.
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: SITE_NAME,
+  url: SITE_URL,
+  description: SITE_DESCRIPTION,
+  applicationCategory: "UtilityApplication",
+  operatingSystem: "Web",
+  browserRequirements: "Requires JavaScript",
+  inLanguage: "es",
+  isAccessibleForFree: true,
+  featureList: [
+    "Cálculo de consumo eléctrico por componentes (CPU, GPU, motherboard, disipador, ventiladores)",
+    "Soporte de estándares ATX 2.52 (pico transitorio) y ATX 3.x (TDP)",
+    "Soporte multi-GPU con suma de cargas",
+    "Asignación de tier de fuente por letras (X a F)",
+    "Fuente de poder recomendada por escalones estándar con tolerancia del 5%",
+    "Aviso de fuentes que requieren instalación 220V/230V",
+  ],
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  publisher: {
+    "@type": "Organization",
+    name: "PSU Gang",
+    url: SITE_URL,
+    sameAs: SOCIAL_URLS,
+  },
+};
 
 // === Enlaces oficiales — reemplazar "#" por las URLs reales de PSU Gang ===
 const SUPPORT_URL = "https://buymeacoffee.com/psugang?l=es";
@@ -44,15 +80,20 @@ const SOCIAL_LINKS: { name: string; href: string; icon: React.ReactNode }[] = [
 export default function Home() {
   return (
     <div className="min-h-dvh flex flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <header className="border-b border-[var(--color-surface)]">
-        <div className="mx-auto w-full max-w-3xl px-6 py-5 flex items-center">
-          {/* Logo placeholder — reemplazar por /public/logo/psu-gang-logo.svg cuando Daniel lo entregue */}
-          <div
-            className="h-8 w-32 rounded-sm border border-[var(--color-accent)] flex items-center justify-center font-mono text-xs tracking-widest text-[var(--color-accent)]"
-            aria-label="PSU Gang"
-          >
-            PSU&nbsp;GANG
-          </div>
+        <div className="mx-auto w-full max-w-3xl px-6 py-5 flex items-center justify-center">
+          <Image
+            src="/logo/empresarial-logo.png"
+            alt="PSU Gang"
+            width={4000}
+            height={1004}
+            priority
+            className="h-20 w-auto"
+          />
         </div>
       </header>
 
@@ -71,9 +112,9 @@ export default function Home() {
               href={SUPPORT_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-mono text-sm text-[var(--color-accent)] hover:underline underline-offset-4"
+              className="font-mono text-sm font-semibold text-[var(--color-accent)] underline underline-offset-4 hover:opacity-80"
             >
-              ¿Gustas apoyar el proyecto? Haz click aquí →
+              ¿Gustas apoyar el proyecto? Haz click aquí
             </a>
           </div>
         </div>

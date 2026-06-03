@@ -25,6 +25,10 @@ const motherboards = motherboardsData as Motherboard[];
 const fans = fansData as Fan[];
 const coolers = coolersData as Cooler[];
 
+// Enlace guía de compra
+const BUY_GUIDE_URL =
+  "https://docs.google.com/document/d/1iYZZeiiHBoXyctOdptDJ2oFYJ03mYiyT3XrXqXJIIQ8/edit?usp=sharing";
+
 const MAX_FANS = 12;
 const MAX_GPUS = 4;
 const MAX_FAN_ROWS = 6;
@@ -132,13 +136,9 @@ export function Calculator() {
   }
 
   function handleCalculate() {
-    const hasGpu = selection.gpuIds.some((id) => id !== null);
-    if (
-      selection.cpuId === null ||
-      !hasGpu ||
-      selection.motherboardId === null
-    ) {
-      setError("Selecciona al menos CPU, GPU y motherboard para calcular.");
+    // GPU opcional: CPUs con gráficos integrados (ej. 8600G) no requieren GPU dedicada.
+    if (selection.cpuId === null || selection.motherboardId === null) {
+      setError("Selecciona al menos CPU y motherboard para calcular.");
       setResult(null);
       return;
     }
@@ -163,7 +163,8 @@ export function Calculator() {
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <span className="block text-xs uppercase tracking-widest text-[var(--color-muted)]">
-              GPU{selection.gpuIds.length > 1 ? "s" : ""}
+              GPU{selection.gpuIds.length > 1 ? "s" : ""}{" "}
+              <span className="lowercase text-[var(--color-muted)]/70">(opcional)</span>
             </span>
             {selection.gpuIds.length < MAX_GPUS && (
               <button
@@ -316,6 +317,18 @@ export function Calculator() {
 
       <aside>
         <ResultCard result={result} />
+        {result && (
+          <div className="mt-4 text-center">
+            <a
+              href={BUY_GUIDE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-mono text-sm font-semibold text-[var(--color-accent)] underline underline-offset-4 hover:opacity-80"
+            >
+              ¿Quieres saber qué fuente comprar?
+            </a>
+          </div>
+        )}
       </aside>
     </div>
   );
