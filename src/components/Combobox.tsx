@@ -33,12 +33,12 @@ export function Combobox({
   const selectedItem = options.find((o) => o.value === value) ?? null;
   const [inputValue, setInputValue] = useState(selectedItem?.label ?? "");
 
-  // Sync the visible text when the parent changes/clears the value
-  // (e.g. a brand filter invalidated the current model).
+  // Sync the visible text when the parent changes/clears the selected value
+  // OR swaps the options list (e.g. a brand filter changed the models).
+  // Parents memoize `options`, so this does not re-run while the user types.
   useEffect(() => {
     setInputValue(options.find((o) => o.value === value)?.label ?? "");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]);
+  }, [options, value]);
 
   const items = options.filter((o) => matches(o.searchText, inputValue));
 
