@@ -59,10 +59,15 @@ export function GpuPicker({ gpus, index, value, onChange }: GpuPickerProps) {
         onChange={handleBrandChange}
       />
       <Combobox
-        placeholder={`Busca o elige tu GPU ${index + 1}`}
+        placeholder={
+          brand === null
+            ? "Elige marca primero"
+            : `Busca o elige tu GPU ${index + 1}`
+        }
         options={modelOptions}
         value={value}
         onChange={onChange}
+        disabled={brand === null}
       />
     </div>
   );

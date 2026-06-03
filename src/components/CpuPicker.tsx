@@ -9,11 +9,19 @@ interface CpuPickerProps {
   cpus: Cpu[];
   value: string | null;
   onChange: (cpuId: string | null) => void;
+  /** Notifies the parent of the active socket filter (drives the mobo gate). */
+  onSocketChange?: (socket: string | null) => void;
 }
 
 // Hybrid CPU selector: hard-constraint brand + socket filters drive a
-// searchable model combobox. Filter state is local UI state.
-export function CpuPicker({ cpus, value, onChange }: CpuPickerProps) {
+// searchable model combobox. Brand must be chosen before socket/model unlock.
+// Filter state is local UI state.
+export function CpuPicker({
+  cpus,
+  value,
+  onChange,
+  onSocketChange,
+}: CpuPickerProps) {
   const [brand, setBrand] = useState<string | null>(null);
   const [socket, setSocket] = useState<string | null>(null);
 
@@ -26,15 +34,18 @@ export function CpuPicker({ cpus, value, onChange }: CpuPickerProps) {
     [cpus],
   );
 
+  // Empty until a brand is chosen — keeps the socket select disabled (gated).
   const socketOptions = useMemo(
     () =>
-      [
-        ...new Set(
-          cpus
-            .filter((c) => (brand === null || c.brand === brand) && c.socket)
-            .map((c) => c.socket as string),
-        ),
-      ].map((s) => ({ value: s, label: s })),
+      brand === null
+        ? []
+        : [
+            ...new Set(
+              cpus
+                .filter((c) => c.brand === brand && c.socket)
+                .map((c) => c.socket as string),
+            ),
+          ].map((s) => ({ value: s, label: s })),
     [cpus, brand],
   );
 
@@ -58,6 +69,7 @@ export function CpuPicker({ cpus, value, onChange }: CpuPickerProps) {
   function applyFilter(nextBrand: string | null, nextSocket: string | null) {
     setBrand(nextBrand);
     setSocket(nextSocket);
+    onSocketChange?.(nextSocket);
     if (
       value !== null &&
       !cpus.some(
@@ -95,17 +107,20 @@ export function CpuPicker({ cpus, value, onChange }: CpuPickerProps) {
           onChange={handleBrandChange}
         />
         <ComponentSelect
-          placeholder="Socket"
+          placeholder={brand === null ? "Elige marca" : "Socket"}
           options={socketOptions}
           value={socket}
           onChange={(nextSocket) => applyFilter(brand, nextSocket)}
         />
       </div>
       <Combobox
-        placeholder="Busca o elige tu CPU"
+        placeholder={
+          brand === null ? "Elige marca primero" : "Busca o elige tu CPU"
+        }
         options={modelOptions}
         value={value}
         onChange={onChange}
+        disabled={brand === null}
       />
     </div>
   );
