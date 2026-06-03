@@ -70,17 +70,26 @@ export function Calculator() {
   }
 
   // --- Socket-based motherboard filter --------------------------------------
-  // Selected CPU's socket. `null` when no CPU is chosen or the CPU's socket is
-  // unknown in the dataset — in that case no filter is applied (show all).
+  // The CPU picker's socket filter, lifted here so the motherboard section can
+  // gate on it (mobo stays locked until a socket is defined).
+  const [cpuFilterSocket, setCpuFilterSocket] = useState<string | null>(null);
+
+  // Selected CPU's socket. `null` when no CPU is chosen or its socket is unknown.
   const cpuSocket =
     cpus.find((c) => c.id === selection.cpuId)?.socket ?? null;
 
+  // Effective socket = the explicit socket filter, or the chosen CPU's socket.
+  // `null` = no socket yet → the motherboard select is gated (empty + disabled).
+  const effectiveSocket = cpuFilterSocket ?? cpuSocket;
+
   const moboOptions = useMemo<SelectOption[]>(
     () =>
-      motherboards
-        .filter((m) => cpuSocket === null || m.socket === cpuSocket)
-        .map((m) => ({ value: m.id, label: m.label })),
-    [cpuSocket],
+      effectiveSocket === null
+        ? []
+        : motherboards
+            .filter((m) => m.socket === effectiveSocket)
+            .map((m) => ({ value: m.id, label: m.label })),
+    [effectiveSocket],
   );
 
   // Changing the CPU clears the selected motherboard if its socket no longer
@@ -90,6 +99,16 @@ export function Calculator() {
     const mobo = motherboards.find((m) => m.id === selection.motherboardId);
     const keepMobo = !cpu?.socket || !mobo || mobo.socket === cpu.socket;
     patch({ cpuId, motherboardId: keepMobo ? selection.motherboardId : null });
+  }
+
+  // The socket filter moved — clear an incompatible motherboard for the same
+  // reason as above.
+  function handleCpuSocketFilter(socket: string | null) {
+    setCpuFilterSocket(socket);
+    const mobo = motherboards.find((m) => m.id === selection.motherboardId);
+    if (socket !== null && mobo && mobo.socket !== socket) {
+      patch({ motherboardId: null });
+    }
   }
 
   // --- GPU rows -------------------------------------------------------------
@@ -149,6 +168,7 @@ export function Calculator() {
           cpus={cpus}
           value={selection.cpuId}
           onChange={handleCpuChange}
+          onSocketChange={handleCpuSocketFilter}
         />
 
         {/* GPUs — multi-GPU: one row per card */}
@@ -195,9 +215,9 @@ export function Calculator() {
         <ComponentSelect
           label="Motherboard"
           placeholder={
-            cpuSocket
-              ? `Socket ${cpuSocket} — elige chipset`
-              : "Selecciona el chipset"
+            effectiveSocket
+              ? `Socket ${effectiveSocket} — elige chipset`
+              : "Elige el socket del CPU primero"
           }
           options={moboOptions}
           value={selection.motherboardId}
