@@ -13,6 +13,8 @@ import { calculate, type CalculationResult } from "@/lib/calculator";
 import { AtxToggle } from "./AtxToggle";
 import { ComponentSelect, type SelectOption } from "./ComponentSelect";
 import { ResultCard } from "./ResultCard";
+import { CpuPicker } from "./CpuPicker";
+import { GpuPicker } from "./GpuPicker";
 import cpusData from "@/data/cpus.json";
 import gpusData from "@/data/gpus.json";
 import motherboardsData from "@/data/motherboards.json";
@@ -33,14 +35,6 @@ const MAX_FANS = 15;
 const MAX_GPUS = 4;
 const MAX_FAN_ROWS = 3;
 
-const cpuOptions: SelectOption[] = cpus.map((c) => ({
-  value: c.id,
-  label: `${c.brand} ${c.model}`,
-}));
-const gpuOptions: SelectOption[] = gpus.map((g) => ({
-  value: g.id,
-  label: `${g.brand} ${g.model}`,
-}));
 const fanOptions: SelectOption[] = fans.map((f) => ({
   value: f.id,
   label: f.label,
@@ -151,10 +145,8 @@ export function Calculator() {
       <section className="space-y-5">
         <AtxToggle mode={selection.mode} onChange={(mode) => patch({ mode })} />
 
-        <ComponentSelect
-          label="CPU"
-          placeholder="Selecciona tu CPU"
-          options={cpuOptions}
+        <CpuPicker
+          cpus={cpus}
           value={selection.cpuId}
           onChange={handleCpuChange}
         />
@@ -179,9 +171,9 @@ export function Calculator() {
           {selection.gpuIds.map((gpuId, i) => (
             <div key={i} className="flex items-end gap-2">
               <div className="flex-1">
-                <ComponentSelect
-                  placeholder={`Selecciona tu GPU ${i + 1}`}
-                  options={gpuOptions}
+                <GpuPicker
+                  gpus={gpus}
+                  index={i}
                   value={gpuId}
                   onChange={(id) => setGpuAt(i, id)}
                 />
