@@ -7,11 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test": "vitest run",
     "pages:build": "npx @cloudflare/next-on-pages",
     "preview": "npm run pages:build && wrangler pages dev",
     "deploy": "npm run pages:build && wrangler pages deploy"
   },
   "dependencies": {
+    "downshift": "^9.3.4",
     "next": "^15.5.19",
     "react": "19.1.0",
     "react-dom": "19.1.0"
@@ -24,6 +26,7 @@
     "@types/react-dom": "^19",
     "tailwindcss": "^4.1.8",
     "typescript": "^5",
+    "vitest": "^4.1.8",
     "wrangler": "^4.97.0"
   }
 }
