@@ -36,4 +36,7 @@ describe("matches", () => {
     expect(matches(rtx4090, "")).toBe(true);
     expect(matches(rtx4090, "   ")).toBe(true);
   });
+  it("blank searchText does not match a non-empty query", () => {
+    expect(matches("", "rtx")).toBe(false);
+  });
 });

@@ -5,7 +5,7 @@ export function normalize(str: string): string {
   return str
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
+    .replace(/[\u0300-\u036F]/g, "")
     .replace(/\s+/g, " ")
     .trim();
 }
