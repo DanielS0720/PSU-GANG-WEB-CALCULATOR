@@ -69,6 +69,27 @@ export interface PsuStandard {
   requires_220v: boolean;
 }
 
+/** A real PSU model on the quality tier list, used for the adequacy alert and featured models. */
+export interface PsuModel {
+  id: string;
+  brand: string;
+  model: string;
+  /** Rated wattage. */
+  w: number;
+  /** Quality tier id, one of the ids in tiers.json (e.g. "tier-a"). */
+  tier: string;
+  /**
+   * Product image path under /public (e.g. "/psus/<id>.webp"), or null.
+   * Most models are null; only ~4 per tier ship a real image.
+   */
+  image: string | null;
+  /**
+   * Sponsored placement. Absent or 0 = normal. A positive value sorts ahead of
+   * non-sponsored models in the featured list; lower positive value sorts first.
+   */
+  sponsorRank?: number;
+}
+
 export interface Tier {
   id: string;
   label: string;
