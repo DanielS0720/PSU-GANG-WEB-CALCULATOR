@@ -14,6 +14,7 @@ import { calculate, type CalculationResult } from "@/lib/calculator";
 import { AtxToggle } from "./AtxToggle";
 import { ComponentSelect, type SelectOption } from "./ComponentSelect";
 import { ResultCard } from "./ResultCard";
+import { BreakdownCard } from "./BreakdownCard";
 import { CpuPicker } from "./CpuPicker";
 import { GpuPicker } from "./GpuPicker";
 import cpusData from "@/data/cpus.json";
@@ -442,6 +443,7 @@ export function Calculator() {
 
       <aside>
         <ResultCard result={result} />
+        <BreakdownCard result={result} />
         {result && (
           <div className="mt-4 text-center">
             <a
