@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { tierRank, tierLabel, wattBaseline } from "./psuModels";
+import { tierRank, tierLabel, wattBaseline, checkPsuAdequacy } from "./psuModels";
 import type { CalculationResult } from "./calculator";
-import type { PsuStandard, Tier } from "@/types/components";
+import type { PsuModel, PsuStandard, Tier } from "@/types/components";
 
 /** Minimal CalculationResult builder for the logic under test. */
 function makeResult(over: Partial<CalculationResult>): CalculationResult {
@@ -43,5 +43,66 @@ describe("wattBaseline", () => {
   });
   it("falls back to totalWatts when no standard covers the build", () => {
     expect(wattBaseline(makeResult({ recommendedPsu: null, totalWatts: 5600 }))).toBe(5600);
+  });
+});
+
+const tierATier: Tier = {
+  id: "tier-a",
+  label: "Tier A",
+  image: "/tiers/tier-a.png",
+  max_cpu_w: null,
+  max_gpu_w: null,
+};
+
+function model(over: Partial<PsuModel>): PsuModel {
+  return { id: "x", brand: "B", model: "M", w: 850, tier: "tier-a", image: null, ...over };
+}
+
+describe("checkPsuAdequacy", () => {
+  const result = makeResult({
+    tier: tierATier,
+    recommendedPsu: { w: 650, requires_220v: false },
+    totalWatts: 660,
+  });
+
+  it("passes when tier is equal-or-better and watts cover the baseline", () => {
+    expect(checkPsuAdequacy(model({ tier: "tier-s", w: 650 }), result)).toEqual({
+      tierOk: true,
+      wattsOk: true,
+    });
+  });
+
+  it("flags an insufficient quality tier", () => {
+    expect(checkPsuAdequacy(model({ tier: "tier-c", w: 850 }), result)).toEqual({
+      tierOk: false,
+      wattsOk: true,
+    });
+  });
+
+  it("flags insufficient watts (below the recommended step)", () => {
+    expect(checkPsuAdequacy(model({ tier: "tier-a", w: 600 }), result)).toEqual({
+      tierOk: true,
+      wattsOk: false,
+    });
+  });
+
+  it("accepts watts exactly at the recommended step (660 build, 650 step, 650 PSU)", () => {
+    expect(checkPsuAdequacy(model({ tier: "tier-a", w: 650 }), result).wattsOk).toBe(true);
+  });
+
+  it("can fail both checks at once", () => {
+    expect(checkPsuAdequacy(model({ tier: "tier-f", w: 400 }), result)).toEqual({
+      tierOk: false,
+      wattsOk: false,
+    });
+  });
+
+  it("treats a null build tier as permissive (any PSU tier passes)", () => {
+    const noTier = makeResult({
+      tier: null,
+      recommendedPsu: { w: 650, requires_220v: false },
+      totalWatts: 600,
+    });
+    expect(checkPsuAdequacy(model({ tier: "tier-f" }), noTier).tierOk).toBe(true);
   });
 });

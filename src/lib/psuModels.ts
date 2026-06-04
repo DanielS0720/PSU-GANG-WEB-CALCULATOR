@@ -26,3 +26,26 @@ export function tierLabel(tierId: string): string {
 export function wattBaseline(result: CalculationResult): number {
   return result.recommendedPsu?.w ?? result.totalWatts;
 }
+
+export interface PsuAdequacy {
+  /** The PSU's quality tier is equal to or better than the build requires. */
+  tierOk: boolean;
+  /** The PSU's wattage covers the build's wattage baseline. */
+  wattsOk: boolean;
+}
+
+/**
+ * Whether a user-owned PSU model is adequate for the build result. Assumes the
+ * build has a tier (callers guard `result.tier !== null`); a null tier is
+ * treated as the worst rank so any model satisfies the tier check.
+ */
+export function checkPsuAdequacy(
+  model: PsuModel,
+  result: CalculationResult,
+): PsuAdequacy {
+  const requiredRank = tierRank(result.tier?.id ?? "");
+  return {
+    tierOk: tierRank(model.tier) <= requiredRank,
+    wattsOk: model.w >= wattBaseline(result),
+  };
+}
