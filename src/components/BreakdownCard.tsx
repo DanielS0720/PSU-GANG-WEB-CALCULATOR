@@ -16,7 +16,22 @@ export function BreakdownCard({ result }: BreakdownCardProps) {
   useEffect(() => {
     setAdvanced(false);
   }, [result]);
-  if (!result) return null;
+
+  // Placeholder keeps the left column occupied before calculating, so the
+  // layout stays centered and nothing shifts when the breakdown fills in.
+  if (!result) {
+    return (
+      <div className="rounded-lg border border-dashed border-[var(--color-muted)]/40 bg-[var(--color-surface)] p-6 text-center">
+        <span className="block text-xs uppercase tracking-widest text-[var(--color-muted)] mb-3">
+          Desglose de consumo
+        </span>
+        <p className="font-mono text-sm text-[var(--color-muted)] py-8">
+          Aparece al presionar{" "}
+          <span className="text-[var(--color-accent)]">Calcular</span>.
+        </p>
+      </div>
+    );
+  }
 
   const { lines, rail12, rail5, rail3v3 } = result.breakdown;
   const rail12Lines = lines.filter((l) => l.v12 > 0);

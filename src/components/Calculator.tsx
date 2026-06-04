@@ -205,7 +205,7 @@ export function Calculator() {
   }
 
   return (
-    <div className="grid gap-8 md:grid-cols-[1fr_1fr_300px] md:items-start">
+    <div className="grid gap-8 md:grid-cols-[320px_minmax(0,1fr)_320px] md:items-start">
       {/* Breakdown — left of the form (left of the ATX buttons) */}
       <BreakdownCard result={result} />
 
