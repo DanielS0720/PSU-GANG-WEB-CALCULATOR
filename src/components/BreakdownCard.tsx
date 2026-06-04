@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { CalculationResult } from "@/lib/calculator";
 
 interface BreakdownCardProps {
@@ -12,6 +12,10 @@ interface BreakdownCardProps {
 // are informational and never change the recommended PSU.
 export function BreakdownCard({ result }: BreakdownCardProps) {
   const [advanced, setAdvanced] = useState(false);
+  // Collapse the advanced view whenever a fresh result arrives.
+  useEffect(() => {
+    setAdvanced(false);
+  }, [result]);
   if (!result) return null;
 
   const { lines, rail12, rail5, rail3v3 } = result.breakdown;

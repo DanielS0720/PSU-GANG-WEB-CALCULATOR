@@ -251,6 +251,12 @@ export function calculate(selection: Selection): CalculationResult {
     ...storageLines,
   ];
 
+  // Overclock / future-proof headroom is 12V; surface it so the rail total
+  // matches the recommended wattage.
+  if (optionWatts > 0) {
+    lines.push({ label: "Extras (OC/FP)", v12: optionWatts, v5: 0, v3v3: 0 });
+  }
+
   // Tier is driven by CPU + GPU load only (per ATX mode), never by the
   // recommended wattage or the overclock / future-proof extras.
   return {
@@ -258,6 +264,6 @@ export function calculate(selection: Selection): CalculationResult {
     totalWatts,
     recommendedPsu: recommendPsu(totalWatts),
     tier: tierForLoads(cpuWatts, gpuWatts),
-    breakdown: { rail12: baseWatts, rail5, rail3v3, lines },
+    breakdown: { rail12: totalWatts, rail5, rail3v3, lines },
   };
 }

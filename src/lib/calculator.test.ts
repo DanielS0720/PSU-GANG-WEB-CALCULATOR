@@ -116,4 +116,15 @@ describe("calculate — per-rail breakdown", () => {
       expect.objectContaining({ label: "HDD ×2", v12: 40, v5: 0, v3v3: 0 }),
     );
   });
+
+  it("OC/FP extras raise totalWatts and the 12V rail, shown as a line, without changing tier", () => {
+    const plain = calculate(baseSelection());
+    const oc = calculate(baseSelection({ overclock: true }));
+    expect(oc.totalWatts).toBe(plain.totalWatts + 100);
+    expect(oc.breakdown.rail12).toBe(plain.breakdown.rail12 + 100);
+    expect(oc.tier).toBe(plain.tier);
+    expect(oc.breakdown.lines).toContainEqual(
+      expect.objectContaining({ label: "Extras (OC/FP)", v12: 100, v5: 0, v3v3: 0 }),
+    );
+  });
 });
