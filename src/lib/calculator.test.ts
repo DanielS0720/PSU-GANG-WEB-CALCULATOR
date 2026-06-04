@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { resolveStorage, fanRgb5v, coolerRgb5v } from "./calculator";
-import type { Cooler, Fan } from "@/types/components";
+import { resolveStorage, fanRgb5v, coolerRgb5v, calculate } from "./calculator";
+import type { Cooler, Fan, Selection } from "@/types/components";
 
 describe("resolveStorage", () => {
   it("HDD on 12V: 2 units = 40W", () => {
@@ -55,5 +55,65 @@ describe("fanRgb5v / coolerRgb5v", () => {
     expect(coolerRgb5v(rgbAio)).toBe(15);
     expect(coolerRgb5v(plainAio)).toBe(0);
     expect(coolerRgb5v(undefined)).toBe(0);
+  });
+});
+
+function baseSelection(over: Partial<Selection> = {}): Selection {
+  return {
+    mode: "atx-2",
+    cpuId: null,
+    gpuIds: [null],
+    motherboardId: null,
+    coolerId: null,
+    fans: [{ fanId: null, count: 0 }],
+    storage: [],
+    overclock: false,
+    futureProof: false,
+    ...over,
+  };
+}
+
+describe("calculate — per-rail breakdown", () => {
+  it("HDD adds to the 12V total and affects the recommended PSU", () => {
+    const without = calculate(baseSelection({ cpuId: null }));
+    const withHdd = calculate(
+      baseSelection({ storage: [{ unitId: "hdd", subtypeId: null, count: 2 }] }),
+    );
+    expect(withHdd.breakdown.rail12).toBe(without.breakdown.rail12 + 40);
+    expect(withHdd.totalWatts).toBe(without.totalWatts + 40);
+  });
+
+  it("SSD/NVMe land on 5V/3.3V and do NOT change totalWatts or tier", () => {
+    const base = baseSelection({
+      storage: [
+        { unitId: "ssd-sata", subtypeId: null, count: 1 },
+        { unitId: "nvme", subtypeId: "pcie4", count: 2 },
+      ],
+    });
+    const r = calculate(base);
+    expect(r.breakdown.rail5).toBe(8);
+    expect(r.breakdown.rail3v3).toBe(24);
+    expect(r.totalWatts).toBe(0); // nothing on 12V
+    expect(r.tier).toBe(calculate(baseSelection()).tier);
+  });
+
+  it("RGB fans and RGB cooler add to 5V only", () => {
+    const r = calculate(
+      baseSelection({
+        coolerId: "aio-360-rgb",
+        fans: [{ fanId: "120mm-rgb", count: 6 }],
+      }),
+    );
+    // 6 fans × 5W + cooler 15W = 45W on 5V
+    expect(r.breakdown.rail5).toBe(45);
+  });
+
+  it("breakdown.lines carries the storage rows", () => {
+    const r = calculate(
+      baseSelection({ storage: [{ unitId: "hdd", subtypeId: null, count: 2 }] }),
+    );
+    expect(r.breakdown.lines).toContainEqual(
+      expect.objectContaining({ label: "HDD ×2", v12: 40, v5: 0, v3v3: 0 }),
+    );
   });
 });
