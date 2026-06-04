@@ -1,6 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { resolveStorage, fanRgb5v, coolerRgb5v, calculate } from "./calculator";
-import type { Cooler, Fan, Selection } from "@/types/components";
+import type { Cooler, Cpu, Fan, Gpu, Selection } from "@/types/components";
+import cpusData from "@/data/cpus.json";
+import gpusData from "@/data/gpus.json";
+
+const cpus = cpusData as Cpu[];
+const gpus = gpusData as Gpu[];
 
 describe("resolveStorage", () => {
   it("HDD on 12V: 2 units = 40W", () => {
@@ -115,6 +120,14 @@ describe("calculate — per-rail breakdown", () => {
     expect(r.breakdown.lines).toContainEqual(
       expect.objectContaining({ label: "HDD ×2", v12: 40, v5: 0, v3v3: 0 }),
     );
+  });
+
+  it("tier uses peak_w and is identical across ATX modes (only watts differ)", () => {
+    const sel = baseSelection({ cpuId: cpus[0]?.id, gpuIds: [gpus[0]?.id ?? null] });
+    const atx2 = calculate({ ...sel, mode: "atx-2" });
+    const atx3 = calculate({ ...sel, mode: "atx-3" });
+    expect(atx3.tier).toEqual(atx2.tier); // tier independent of the toggle
+    expect(atx3.totalWatts).toBeLessThanOrEqual(atx2.totalWatts); // watts still differ
   });
 
   it("OC/FP extras raise totalWatts and the 12V rail, shown as a line, without changing tier", () => {

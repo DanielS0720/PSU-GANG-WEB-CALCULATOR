@@ -226,14 +226,19 @@ psu-gang-calculator/
 ```
 field = (atx === "2.52") ? "peak_w" : "tdp_w"   // 2.52 → pico transitorio; 3.x → TDP
 
-cpuLoad = cpu[field]
-gpuLoad = Σ gpu[field]   // multi-GPU: suma de TODAS las GPUs seleccionadas
+cpuLoad = cpu[field]              // alimenta SOLO el consumo/fuente recomendada
+gpuLoad = Σ gpu[field]            // multi-GPU: suma de TODAS las GPUs seleccionadas
+
+cpuPeak = cpu.peak_w             // alimenta el TIER (siempre, ignora el toggle ATX)
+gpuPeak = Σ gpu.peak_w
 ```
 
-> El estándar ATX seleccionado determina **qué valor del dataset** alimenta la asignación de tier:
+> El estándar ATX seleccionado determina **qué valor del dataset** alimenta el **consumo / fuente recomendada** (Pasos 2 y 4):
 > - **ATX 2.52 o inferior**: `peak_w` (la fuente debe soportar el pico transitorio completo).
 > - **ATX 3.x**: `tdp_w` (la especificación ATX 3.x ya cubre el power excursion sobre el TDP nominal).
-> - **Multi-GPU**: `gpuLoad` es la **suma** de la carga de todas las GPUs (no la mayor individual). Con 2+ GPUs casi siempre cae en Tier A/X.
+> - **Multi-GPU**: la carga es la **suma** de todas las GPUs (no la mayor individual). Con 2+ GPUs casi siempre cae en Tier A/X.
+>
+> **El TIER NO depende del toggle ATX.** El tier es una clase de calidad de fuente y refleja el **pico transitorio del hardware** (`peak_w`), que es una propiedad fija del silicio. Por eso el tier siempre usa `cpuPeak` / `gpuPeak` (`peak_w`), aunque el consumo use `tdp_w` en ATX 3.x. Ver Paso 3.
 
 ### Paso 2 — Consumo total calculado (sí lo afectan las opciones extra)
 
@@ -257,10 +262,11 @@ if future_proof: consumoTotal += 100
 
 ```
 tierRecomendado = el tier con el ID más bajo (peor calidad) tal que:
-  (tier.max_cpu_w === null  O  tier.max_cpu_w >= cpuLoad)
+  (tier.max_cpu_w === null  O  tier.max_cpu_w >= cpuPeak)
   Y
-  (tier.max_gpu_w === null  O  tier.max_gpu_w >= gpuLoad)   // gpuLoad = suma multi-GPU
+  (tier.max_gpu_w === null  O  tier.max_gpu_w >= gpuPeak)   // peak_w SIEMPRE, suma multi-GPU
 ```
+> Usa `cpuPeak` / `gpuPeak` (`peak_w`), **no** la carga del Paso 1 — el tier es **independiente del toggle ATX**.
 
 El algoritmo recorre `tiers.json` **de peor a mejor** (Tier F → Tier S) y devuelve el primer tier que no viola ningún límite. Esto garantiza el tier mínimo recomendado.
 
@@ -338,7 +344,7 @@ fuenteRecomendada = primer escalón S (ascendente) tal que:
    - `[ ] Future Proof (+100W)`
 7. **Resultado**: aparece en tiempo real (sin botón de submit; reactivo con `useEffect`/computed). Muestra:
    - **Watts recomendados** de la fuente (suma de componentes + `+100W` por cada opción extra marcada)
-   - **Tier mínimo recomendado** (basado en `peak_w` para ATX 2.52 o `tdp_w` para ATX 3.x del CPU y GPU; **no** afectado por overclock / future proof)
+   - **Tier mínimo recomendado** (siempre basado en `peak_w` del CPU y GPU, **independiente del toggle ATX**; **no** afectado por overclock / future proof)
    - Imagen del tier
    - Label del tier
    - Indicación si el CPU o GPU excede los límites del tier actual (opcional)

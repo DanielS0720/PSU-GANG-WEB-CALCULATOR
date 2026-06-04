@@ -175,9 +175,9 @@ export function tierForLoads(cpuLoad: number, gpuLoad: number): Tier | null {
  *   mode       = "peak_w" if ATX 2.52 or below, "tdp_w" if ATX 3.x (peak fallback)
  *   totalWatts = baseWatts + 100 per enabled extra (overclock / future proof)
  *
- * The tier is derived from the CPU + GPU load (per ATX mode) via tierForLoads —
- * overclock / future proof change the recommended wattage but never the assigned
- * tier. Components that are not selected contribute 0W.
+ * The tier is derived from the CPU + GPU transient peak (peak_w, always — never
+ * the ATX-mode watt field) via tierForLoads. Overclock / future proof change the
+ * recommended wattage but never the assigned tier. Unselected components are 0W.
  */
 export function calculate(selection: Selection): CalculationResult {
   const cpu = findById(cpus, selection.cpuId);
@@ -188,6 +188,16 @@ export function calculate(selection: Selection): CalculationResult {
     (sum, id) => sum + loadFor(findById(gpus, id), selection.mode),
     0,
   );
+
+  // Tier is a PSU quality class: it reflects the hardware transient peak, which
+  // is a fixed property of the silicon and does NOT depend on the ATX standard.
+  // So the tier always uses peak_w, even when the watt calc uses tdp_w (ATX 3.x).
+  const cpuPeak = cpu?.peak_w ?? 0;
+  const gpuPeak = selection.gpuIds.reduce(
+    (sum, id) => sum + (findById(gpus, id)?.peak_w ?? 0),
+    0,
+  );
+
   const moboWatts = motherboard?.avg_w ?? 0;
 
   const cooler = findById(coolers, selection.coolerId);
@@ -257,13 +267,13 @@ export function calculate(selection: Selection): CalculationResult {
     lines.push({ label: "Extras (OC/FP)", v12: optionWatts, v5: 0, v3v3: 0 });
   }
 
-  // Tier is driven by CPU + GPU load only (per ATX mode), never by the
-  // recommended wattage or the overclock / future-proof extras.
+  // Tier is driven by the CPU + GPU transient peak (peak_w) only, never by the
+  // ATX-mode watt field, the recommended wattage, or the OC / future-proof extras.
   return {
     baseWatts,
     totalWatts,
     recommendedPsu: recommendPsu(totalWatts),
-    tier: tierForLoads(cpuWatts, gpuWatts),
+    tier: tierForLoads(cpuPeak, gpuPeak),
     breakdown: { rail12: totalWatts, rail5, rail3v3, lines },
   };
 }
