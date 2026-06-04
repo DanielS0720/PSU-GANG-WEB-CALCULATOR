@@ -5,11 +5,11 @@ interface ResultCardProps {
   result: CalculationResult | null;
 }
 
-// Displays total watts + recommended tier image after the user presses Calcular.
+// Recommended PSU + tier in a single card. Shown after the user presses Calcular.
 export function ResultCard({ result }: ResultCardProps) {
   if (!result) {
     return (
-      <div className="rounded-lg border border-dashed border-[var(--color-muted)]/40 bg-[var(--color-surface)] p-6 text-center md:sticky md:top-6">
+      <div className="rounded-lg border border-dashed border-[var(--color-muted)]/40 bg-[var(--color-surface)] p-6 text-center">
         <span className="block text-xs uppercase tracking-widest text-[var(--color-muted)] mb-3">
           Potencia recomendada
         </span>
@@ -25,7 +25,7 @@ export function ResultCard({ result }: ResultCardProps) {
   const extraWatts = totalWatts - baseWatts;
 
   return (
-    <div className="rounded-lg border border-[var(--color-surface)] bg-[var(--color-surface)] p-6 text-center md:sticky md:top-6">
+    <div className="rounded-lg border border-[var(--color-surface)] bg-[var(--color-surface)] p-6 text-center">
       <span className="block text-xs uppercase tracking-widest text-[var(--color-muted)] mb-3">
         Fuente recomendada
       </span>

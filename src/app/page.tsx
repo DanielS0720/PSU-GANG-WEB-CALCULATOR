@@ -98,7 +98,7 @@ export default function Home() {
       </header>
 
       <main className="flex-1">
-        <div className="mx-auto w-full max-w-3xl px-6 py-10">
+        <div className="mx-auto w-full max-w-6xl px-6 py-10">
           <h1 className="font-mono text-2xl font-semibold mb-1">
             Watt Calculator
           </h1>

@@ -5,6 +5,9 @@ export type AtxMode = "atx-2" | "atx-3";
 /** Watt field selected from a component depending on the ATX mode. */
 export type WattMode = "peak_w" | "tdp_w";
 
+/** Power rail a component draws from. */
+export type Rail = "12v" | "5v" | "3v3";
+
 export interface Cpu {
   id: string;
   brand: string;
@@ -42,8 +45,10 @@ export interface Motherboard {
 export interface Fan {
   id: string;
   label: string;
-  /** Consumption per single fan unit, in watts. */
+  /** Consumption per single fan unit, in watts (12V). */
   w_per_unit: number;
+  /** Extra draw per unit on the 5V rail when the fan is RGB. */
+  rgb_5v?: number;
 }
 
 /** CPU cooler: air tower or AIO liquid. */
@@ -51,8 +56,10 @@ export interface Cooler {
   id: string;
   label: string;
   type: "air" | "aio";
-  /** Consumption in watts. `null` until the value is supplied; counts as 0W. */
+  /** Consumption in watts (12V). `null` until supplied; counts as 0W. */
   w: number | null;
+  /** Draw on the 5V rail when the cooler is RGB (5/10/15 by size). */
+  rgb_5v?: number;
 }
 
 /** A standard PSU wattage step. */
@@ -79,6 +86,30 @@ export interface FanSelection {
   count: number;
 }
 
+/** NVMe generation option (the only unit with subtypes). */
+export interface StorageSubtype {
+  id: string;
+  label: string;
+  /** Consumption per drive, in watts. */
+  w: number;
+}
+
+/** A storage unit kind. `w` for fixed units (HDD, SSD); `subtypes` for NVMe. */
+export interface StorageUnit {
+  id: string;
+  label: string;
+  rail: Rail;
+  w?: number;
+  subtypes?: StorageSubtype[];
+}
+
+/** One storage row: a unit, an optional NVMe subtype, and a quantity (0–8). */
+export interface StorageSelection {
+  unitId: string | null;
+  subtypeId: string | null;
+  count: number;
+}
+
 /** Full user selection consumed by the calculator. */
 export interface Selection {
   mode: AtxMode;
@@ -90,6 +121,8 @@ export interface Selection {
   coolerId: string | null;
   /** One entry per fan type, each with its own quantity. */
   fans: FanSelection[];
+  /** One row per storage unit (max 4 rows). */
+  storage: StorageSelection[];
   overclock: boolean;
   futureProof: boolean;
 }
