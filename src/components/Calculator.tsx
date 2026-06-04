@@ -14,6 +14,7 @@ import { calculate, type CalculationResult } from "@/lib/calculator";
 import { AtxToggle } from "./AtxToggle";
 import { ComponentSelect, type SelectOption } from "./ComponentSelect";
 import { ResultCard } from "./ResultCard";
+import { TierCard } from "./TierCard";
 import { BreakdownCard } from "./BreakdownCard";
 import { CpuPicker } from "./CpuPicker";
 import { GpuPicker } from "./GpuPicker";
@@ -443,25 +444,24 @@ export function Calculator() {
       </section>
       </div>
 
-      {/* Results row — breakdown (left) and recommended PSU (right) at the same height */}
-      <div className="grid gap-8 md:grid-cols-[1fr_320px] md:items-start">
+      {/* Results row — breakdown (left) + recommended PSU (center) + tier (right), same height */}
+      <div className="grid gap-8 md:grid-cols-[2fr_1fr_1fr] md:items-start">
         <BreakdownCard result={result} />
-        <aside>
-          <ResultCard result={result} />
-          {result && (
-            <div className="mt-4 text-center">
-              <a
-                href={BUY_GUIDE_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-mono text-sm font-semibold text-[var(--color-accent)] underline underline-offset-4 hover:opacity-80"
-              >
-                ¿Quieres saber qué fuente comprar?
-              </a>
-            </div>
-          )}
-        </aside>
+        <ResultCard result={result} />
+        <TierCard result={result} />
       </div>
+      {result && (
+        <div className="text-center">
+          <a
+            href={BUY_GUIDE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-mono text-sm font-semibold text-[var(--color-accent)] underline underline-offset-4 hover:opacity-80"
+          >
+            ¿Quieres saber qué fuente comprar?
+          </a>
+        </div>
+      )}
     </div>
   );
 }
