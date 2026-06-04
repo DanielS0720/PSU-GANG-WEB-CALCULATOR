@@ -8,6 +8,7 @@ import type {
   Fan,
   Cooler,
   Selection,
+  StorageUnit,
 } from "@/types/components";
 import { calculate, type CalculationResult } from "@/lib/calculator";
 import { AtxToggle } from "./AtxToggle";
@@ -20,6 +21,7 @@ import gpusData from "@/data/gpus.json";
 import motherboardsData from "@/data/motherboards.json";
 import fansData from "@/data/fans.json";
 import coolersData from "@/data/coolers.json";
+import storageData from "@/data/storage.json";
 
 const cpus = cpusData as Cpu[];
 const gpus = gpusData as Gpu[];
@@ -44,6 +46,15 @@ const coolerOptions: SelectOption[] = coolers.map((c) => ({
   label: c.label,
 }));
 
+const storageUnits = storageData.units as StorageUnit[];
+const MAX_STORAGE_ROWS = 4;
+const MAX_STORAGE_PER_ROW = 8;
+
+const storageUnitOptions: SelectOption[] = storageUnits.map((u) => ({
+  value: u.id,
+  label: u.label,
+}));
+
 export function Calculator() {
   // Draft = what the user is editing. The result is computed only when the
   // user presses "Calcular", so the ATX mode (and every other field) is
@@ -55,6 +66,7 @@ export function Calculator() {
     motherboardId: null,
     coolerId: null,
     fans: [{ fanId: null, count: 0 }],
+    storage: [{ unitId: null, subtypeId: null, count: 0 }],
     overclock: false,
     futureProof: false,
   });
@@ -146,6 +158,38 @@ export function Calculator() {
   function removeFanAt(index: number) {
     if (selection.fans.length <= 1) return;
     patch({ fans: selection.fans.filter((_, i) => i !== index) });
+  }
+
+  // --- Storage rows ---------------------------------------------------------
+  function setStorageUnitAt(index: number, unitId: string | null) {
+    // Changing the unit clears any stale NVMe subtype.
+    patch({
+      storage: selection.storage.map((row, i) =>
+        i === index ? { ...row, unitId, subtypeId: null } : row,
+      ),
+    });
+  }
+  function setStorageSubtypeAt(index: number, subtypeId: string | null) {
+    patch({
+      storage: selection.storage.map((row, i) =>
+        i === index ? { ...row, subtypeId } : row,
+      ),
+    });
+  }
+  function setStorageCountAt(index: number, count: number) {
+    patch({
+      storage: selection.storage.map((row, i) =>
+        i === index ? { ...row, count } : row,
+      ),
+    });
+  }
+  function addStorage() {
+    if (selection.storage.length >= MAX_STORAGE_ROWS) return;
+    patch({ storage: [...selection.storage, { unitId: null, subtypeId: null, count: 0 }] });
+  }
+  function removeStorageAt(index: number) {
+    if (selection.storage.length <= 1) return;
+    patch({ storage: selection.storage.filter((_, i) => i !== index) });
   }
 
   function handleCalculate() {
@@ -290,6 +334,74 @@ export function Calculator() {
               )}
             </div>
           ))}
+        </div>
+
+        {/* Storage — one row per unit; NVMe unlocks the subtype select */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="block text-xs uppercase tracking-widest text-[var(--color-muted)]">
+              Almacenamiento
+            </span>
+            {selection.storage.length < MAX_STORAGE_ROWS && (
+              <button
+                type="button"
+                onClick={addStorage}
+                className="font-mono text-xs uppercase tracking-widest text-[var(--color-accent)] hover:opacity-80"
+              >
+                + Agregar unidad
+              </button>
+            )}
+          </div>
+          {selection.storage.map((row, i) => {
+            const unit = storageUnits.find((u) => u.id === row.unitId);
+            const subtypeOptions: SelectOption[] =
+              unit?.subtypes?.map((s) => ({ value: s.id, label: s.label })) ?? [];
+            return (
+              <div key={i} className="flex items-end gap-2">
+                <div className="flex-1 grid grid-cols-[1fr_1fr_80px] gap-3 items-end">
+                  <ComponentSelect
+                    placeholder="Unidad"
+                    options={storageUnitOptions}
+                    value={row.unitId}
+                    onChange={(unitId) => setStorageUnitAt(i, unitId)}
+                  />
+                  <ComponentSelect
+                    placeholder={subtypeOptions.length ? "Tipo" : "—"}
+                    options={subtypeOptions}
+                    value={row.subtypeId}
+                    onChange={(subtypeId) => setStorageSubtypeAt(i, subtypeId)}
+                  />
+                  <label className="block">
+                    <span className="block text-xs uppercase tracking-widest text-[var(--color-muted)] mb-2">
+                      Cantidad
+                    </span>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="0"
+                      value={row.count === 0 ? "" : String(row.count)}
+                      onChange={(e) => {
+                        const digits = e.target.value.replace(/\D/g, "").slice(0, 1);
+                        const n = digits === "" ? 0 : Number(digits);
+                        setStorageCountAt(i, Math.min(MAX_STORAGE_PER_ROW, n));
+                      }}
+                      className="w-full rounded-md border border-[var(--color-surface)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text)] focus:border-[var(--color-accent)] focus:outline-none"
+                    />
+                  </label>
+                </div>
+                {selection.storage.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeStorageAt(i)}
+                    aria-label={`Eliminar unidad ${i + 1}`}
+                    className="rounded-md border border-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-muted)] hover:text-red-400 hover:border-red-400"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         <fieldset className="space-y-2">
