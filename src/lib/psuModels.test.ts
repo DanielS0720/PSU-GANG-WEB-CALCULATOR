@@ -55,7 +55,7 @@ const tierATier: Tier = {
 };
 
 function model(over: Partial<PsuModel>): PsuModel {
-  return { id: "x", brand: "B", model: "M", w: 850, tier: "tier-a", image: null, ...over };
+  return { id: "x", brand: "B", model: "M", w: 850, tier: "tier-a", atx: "3.x", image: null, ...over };
 }
 
 describe("checkPsuAdequacy", () => {
@@ -115,33 +115,40 @@ describe("featuredPsus", () => {
   });
 
   const models: PsuModel[] = [
-    model({ id: "too-weak-watts", tier: "tier-s", w: 600 }),       // excluded: < 650
-    model({ id: "too-weak-tier", tier: "tier-c", w: 850 }),        // excluded: worse than tier-a
-    model({ id: "plain-700", tier: "tier-a", w: 700 }),            // compatible, dist 50
-    model({ id: "plain-650", tier: "tier-s", w: 650 }),            // compatible, dist 0
-    model({ id: "plain-900", tier: "tier-a", w: 900 }),            // compatible, dist 250
-    model({ id: "sponsor-800", tier: "tier-a", w: 800, sponsorRank: 1 }), // sponsored
+    model({ id: "below-watts", tier: "tier-s", w: 600 }),                 // excluded: != 650 (below)
+    model({ id: "above-watts", tier: "tier-a", w: 700 }),                 // excluded: != 650 (above, no oversize)
+    model({ id: "sponsor-above", tier: "tier-a", w: 850, sponsorRank: 1 }), // excluded: oversize even if sponsored
+    model({ id: "weak-tier", tier: "tier-c", w: 650 }),                   // excluded: worse than tier-a
+    model({ id: "atx2-650", tier: "tier-s", w: 650, atx: "2.x" }),        // excluded: not ATX 3.x
+    model({ id: "match-a", tier: "tier-a", w: 650 }),                     // compatible (exact watt, ATX 3.x)
+    model({ id: "match-s", tier: "tier-s", w: 650 }),                     // compatible
+    model({ id: "sponsor-650", tier: "tier-a", w: 650, sponsorRank: 1 }), // compatible, sponsored
   ];
 
-  it("returns only compatible models", () => {
+  it("includes only ATX 3.x models whose wattage equals the recommended step", () => {
     const ids = featuredPsus(result, models).map((m) => m.id);
-    expect(ids).not.toContain("too-weak-watts");
-    expect(ids).not.toContain("too-weak-tier");
+    expect(ids).toEqual(["sponsor-650", "match-a", "match-s"]);
   });
 
-  it("lists sponsored first, then closest wattage to the baseline", () => {
-    expect(featuredPsus(result, models).map((m) => m.id)).toEqual([
-      "sponsor-800", // sponsored wins regardless of distance
-      "plain-650",   // dist 0
-      "plain-700",   // dist 50
-      "plain-900",   // dist 250
-    ]);
+  it("never lists a higher-wattage model, even when sponsored", () => {
+    const ids = featuredPsus(result, models).map((m) => m.id);
+    expect(ids).not.toContain("above-watts");
+    expect(ids).not.toContain("sponsor-above");
+    expect(ids).not.toContain("below-watts");
+  });
+
+  it("excludes ATX 2.x models", () => {
+    expect(featuredPsus(result, models).map((m) => m.id)).not.toContain("atx2-650");
+  });
+
+  it("lists sponsored exact-watt models first", () => {
+    expect(featuredPsus(result, models).map((m) => m.id)[0]).toBe("sponsor-650");
   });
 
   it("honors the limit", () => {
     expect(featuredPsus(result, models, 2).map((m) => m.id)).toEqual([
-      "sponsor-800",
-      "plain-650",
+      "sponsor-650",
+      "match-a",
     ]);
   });
 
@@ -161,11 +168,11 @@ describe("featuredPsus", () => {
 
   it("orders multiple sponsored models by ascending sponsorRank", () => {
     const sponsored: PsuModel[] = [
-      model({ id: "sponsor-2", tier: "tier-a", w: 700, sponsorRank: 2 }),
-      model({ id: "sponsor-1", tier: "tier-a", w: 900, sponsorRank: 1 }),
+      model({ id: "sponsor-2", tier: "tier-a", w: 650, sponsorRank: 2 }),
+      model({ id: "sponsor-1", tier: "tier-a", w: 650, sponsorRank: 1 }),
     ];
     expect(featuredPsus(result, sponsored).map((m) => m.id)).toEqual([
-      "sponsor-1", // rank 1 before rank 2, regardless of wattage distance
+      "sponsor-1", // rank 1 before rank 2
       "sponsor-2",
     ]);
   });

@@ -56,10 +56,12 @@ function sponsorKey(m: PsuModel): number {
 }
 
 /**
- * Up to `limit` PSU models compatible with the build (quality tier equal-or-
- * better AND wattage at or above the baseline), sponsored first, then by
- * wattage closest to the baseline (avoids oversizing). Empty when the build has
- * no tier or nothing is compatible. `models` is injected for testability.
+ * Up to `limit` featured PSU models for the build. A model qualifies only when
+ * it is ATX 3.x, its quality tier is equal-or-better than the build requires,
+ * AND its wattage exactly matches the recommended step (`wattBaseline`) — never
+ * a higher-capacity unit, even a sponsored one. Sponsored models sort first.
+ * Empty when the build has no tier or nothing qualifies. `models` is injected
+ * for testability.
  */
 export function featuredPsus(
   result: CalculationResult,
@@ -71,15 +73,11 @@ export function featuredPsus(
   const baseline = wattBaseline(result);
 
   const compatible = models.filter(
-    (m) => tierRank(m.tier) <= requiredRank && m.w >= baseline,
+    (m) =>
+      m.atx === "3.x" && tierRank(m.tier) <= requiredRank && m.w === baseline,
   );
 
   return [...compatible]
-    .sort((a, b) => {
-      const sa = sponsorKey(a);
-      const sb = sponsorKey(b);
-      if (sa !== sb) return sa - sb;
-      return Math.abs(a.w - baseline) - Math.abs(b.w - baseline);
-    })
+    .sort((a, b) => sponsorKey(a) - sponsorKey(b))
     .slice(0, limit);
 }

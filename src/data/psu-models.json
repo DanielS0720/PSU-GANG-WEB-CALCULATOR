@@ -1,11 +1,14 @@
 [
-  { "id": "corsair-rm850x", "brand": "Corsair", "model": "RM850x", "w": 850, "tier": "tier-a", "image": null, "sponsorRank": 1 },
-  { "id": "corsair-rm750x", "brand": "Corsair", "model": "RM750x", "w": 750, "tier": "tier-a", "image": null },
-  { "id": "seasonic-focus-gx-850", "brand": "Seasonic", "model": "Focus GX-850", "w": 850, "tier": "tier-s", "image": null },
-  { "id": "seasonic-focus-gx-650", "brand": "Seasonic", "model": "Focus GX-650", "w": 650, "tier": "tier-s", "image": null },
-  { "id": "evga-supernova-850-g6", "brand": "EVGA", "model": "SuperNOVA 850 G6", "w": 850, "tier": "tier-b-plus", "image": null },
-  { "id": "evga-supernova-650-g6", "brand": "EVGA", "model": "SuperNOVA 650 G6", "w": 650, "tier": "tier-b-plus", "image": null },
-  { "id": "thermaltake-smart-600", "brand": "Thermaltake", "model": "Smart 600", "w": 600, "tier": "tier-d", "image": null },
-  { "id": "thermaltake-smart-500", "brand": "Thermaltake", "model": "Smart 500", "w": 500, "tier": "tier-d", "image": null },
-  { "id": "genericpower-700", "brand": "GenericPower", "model": "GP-700", "w": 700, "tier": "tier-f", "image": null }
+  { "id": "corsair-rm850x", "brand": "Corsair", "model": "RM850x", "w": 850, "tier": "tier-a", "atx": "2.x", "image": null, "sponsorRank": 1 },
+  { "id": "corsair-rm750x", "brand": "Corsair", "model": "RM750x", "w": 750, "tier": "tier-a", "atx": "2.x", "image": null },
+  { "id": "corsair-rm750x-shift", "brand": "Corsair", "model": "RM750x SHIFT", "w": 750, "tier": "tier-a", "atx": "3.x", "image": null },
+  { "id": "seasonic-focus-gx-850", "brand": "Seasonic", "model": "Focus GX-850 (ATX 3.0)", "w": 850, "tier": "tier-s", "atx": "3.x", "image": null },
+  { "id": "seasonic-focus-gx-650", "brand": "Seasonic", "model": "Focus GX-650 (ATX 3.0)", "w": 650, "tier": "tier-s", "atx": "3.x", "image": null },
+  { "id": "seasonic-focus-gx-550", "brand": "Seasonic", "model": "Focus GX-550 (ATX 3.0)", "w": 550, "tier": "tier-s", "atx": "3.x", "image": null },
+  { "id": "bequiet-pure-power-12-m-550", "brand": "be quiet!", "model": "Pure Power 12 M 550W", "w": 550, "tier": "tier-b", "atx": "3.x", "image": null },
+  { "id": "evga-supernova-850-g6", "brand": "EVGA", "model": "SuperNOVA 850 G6", "w": 850, "tier": "tier-b-plus", "atx": "2.x", "image": null },
+  { "id": "evga-supernova-650-g6", "brand": "EVGA", "model": "SuperNOVA 650 G6", "w": 650, "tier": "tier-b-plus", "atx": "2.x", "image": null },
+  { "id": "thermaltake-smart-600", "brand": "Thermaltake", "model": "Smart 600", "w": 600, "tier": "tier-d", "atx": "2.x", "image": null },
+  { "id": "thermaltake-smart-500", "brand": "Thermaltake", "model": "Smart 500", "w": 500, "tier": "tier-d", "atx": "2.x", "image": null },
+  { "id": "genericpower-700", "brand": "GenericPower", "model": "GP-700", "w": 700, "tier": "tier-f", "atx": "2.x", "image": null }
 ]

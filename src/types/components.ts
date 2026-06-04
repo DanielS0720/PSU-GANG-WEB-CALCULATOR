@@ -78,6 +78,8 @@ export interface PsuModel {
   w: number;
   /** Quality tier id, one of the ids in tiers.json (e.g. "tier-a"). */
   tier: string;
+  /** ATX spec version. Only "3.x" units are eligible as featured models. */
+  atx: "3.x" | "2.x";
   /**
    * Product image path under /public (e.g. "/psus/<id>.webp"), or null.
    * Most models are null; only ~4 per tier ship a real image.
