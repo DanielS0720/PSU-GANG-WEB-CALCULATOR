@@ -206,8 +206,7 @@ export function Calculator() {
   }
 
   return (
-    <div className="space-y-8">
-      <div className="grid gap-8 md:grid-cols-[1fr_320px]">
+    <div className="grid gap-8 md:grid-cols-2 md:items-start">
       <section className="space-y-5">
         <AtxToggle mode={selection.mode} onChange={(mode) => patch({ mode })} />
 
@@ -442,26 +441,27 @@ export function Calculator() {
           <p className="font-mono text-xs text-red-400">{error}</p>
         )}
       </section>
-      </div>
 
-      {/* Results row — breakdown (left) + recommended PSU (center) + tier (right), same height */}
-      <div className="grid gap-8 md:grid-cols-[2fr_1fr_1fr] md:items-start">
-        <BreakdownCard result={result} />
-        <ResultCard result={result} />
-        <TierCard result={result} />
-      </div>
-      {result && (
-        <div className="text-center">
-          <a
-            href={BUY_GUIDE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-mono text-sm font-semibold text-[var(--color-accent)] underline underline-offset-4 hover:opacity-80"
-          >
-            ¿Quieres saber qué fuente comprar?
-          </a>
+      {/* Results column — top-aligned with the form; PSU + Tier side by side, breakdown below */}
+      <aside className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <ResultCard result={result} />
+          <TierCard result={result} />
         </div>
-      )}
+        <BreakdownCard result={result} />
+        {result && (
+          <div className="mt-2 text-center">
+            <a
+              href={BUY_GUIDE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-mono text-sm font-semibold text-[var(--color-accent)] underline underline-offset-4 hover:opacity-80"
+            >
+              ¿Quieres saber qué fuente comprar?
+            </a>
+          </div>
+        )}
+      </aside>
     </div>
   );
 }
