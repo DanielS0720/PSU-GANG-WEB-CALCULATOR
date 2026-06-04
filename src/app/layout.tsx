@@ -1,19 +1,21 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
+import { Inter, VT323 } from "next/font/google";
 import "./globals.css";
 import { SITE_URL, SITE_NAME, SITE_SHORT_NAME, SITE_DESCRIPTION } from "@/lib/site";
 
-const plexMono = IBM_Plex_Mono({
+// Inter — clean sans for headings, body, labels and controls.
+const inter = Inter({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-  variable: "--font-plex-mono",
+  variable: "--font-inter",
   display: "swap",
 });
 
-const plexSans = IBM_Plex_Sans({
+// VT323 — pixel/terminal monospace reserved for metrics and instrument readouts.
+const vt323 = VT323({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-plex-sans",
+  weight: "400",
+  variable: "--font-vt323",
   display: "swap",
 });
 
@@ -81,7 +83,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es" className={`${plexMono.variable} ${plexSans.variable}`}>
+    <html lang="es" className={`${inter.variable} ${vt323.variable}`}>
       <body>{children}</body>
     </html>
   );

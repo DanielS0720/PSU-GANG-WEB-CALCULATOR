@@ -230,7 +230,7 @@ export function Calculator() {
               <button
                 type="button"
                 onClick={addGpu}
-                className="font-mono text-xs uppercase tracking-widest text-[var(--color-accent)] hover:opacity-80"
+                className="text-xs uppercase tracking-widest text-[var(--color-accent)] hover:opacity-80"
               >
                 + Agregar GPU
               </button>
@@ -290,7 +290,7 @@ export function Calculator() {
               <button
                 type="button"
                 onClick={addFan}
-                className="font-mono text-xs uppercase tracking-widest text-[var(--color-accent)] hover:opacity-80"
+                className="text-xs uppercase tracking-widest text-[var(--color-accent)] hover:opacity-80"
               >
                 + Agregar ventilador
               </button>
@@ -350,7 +350,7 @@ export function Calculator() {
               <button
                 type="button"
                 onClick={addStorage}
-                className="font-mono text-xs uppercase tracking-widest text-[var(--color-accent)] hover:opacity-80"
+                className="text-xs uppercase tracking-widest text-[var(--color-accent)] hover:opacity-80"
               >
                 + Agregar unidad
               </button>
@@ -435,12 +435,12 @@ export function Calculator() {
         <button
           type="button"
           onClick={handleCalculate}
-          className="w-full rounded-md bg-[var(--color-accent)] px-4 py-3 font-mono text-sm font-semibold uppercase tracking-widest text-[var(--color-bg)] transition hover:opacity-90 active:opacity-80"
+          className="w-full rounded-md bg-[var(--color-accent)] px-4 py-3 text-sm font-semibold uppercase tracking-widest text-[var(--color-bg)] transition hover:opacity-90 active:opacity-80"
         >
           Calcular
         </button>
         {error && (
-          <p className="font-mono text-xs text-red-400">{error}</p>
+          <p className="text-xs text-red-400">{error}</p>
         )}
       </section>
 
@@ -453,7 +453,7 @@ export function Calculator() {
               href={BUY_GUIDE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-mono text-sm font-semibold text-[var(--color-accent)] underline underline-offset-4 hover:opacity-80"
+              className="text-sm font-semibold text-[var(--color-accent)] underline underline-offset-4 hover:opacity-80"
             >
               ¿Quieres saber qué fuente comprar?
             </a>

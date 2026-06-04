@@ -1,19 +1,25 @@
 @import "tailwindcss";
 
 /* PSU Gang design tokens — single source of truth.
-   Keep in sync with .claude/psu-gang-design-skill.md */
+   Keep in sync with .claude/psu-gang-new-design-skill.md */
 @theme {
   --color-bg: #141414;
   --color-surface: #303030;
   --color-accent: #03d6b3;
   --color-text: #ffffff;
   --color-muted: #888888;
+  /* Secondary — use sparingly for hardware categorization (e.g. storage stress). */
+  --color-purple: #8f05e8;
+  --color-orange: #ffa617;
 }
 
-/* Map next/font CSS variables (set in layout.tsx) to Tailwind font utilities. */
+/* Map next/font CSS variables (set in layout.tsx) to Tailwind font utilities.
+   Inter = headings, body, labels, controls. VT323 = metrics / instrument readouts
+   only (watt outputs, breakdown values) via `font-metric`. */
 @theme inline {
-  --font-mono: var(--font-plex-mono);
-  --font-sans: var(--font-plex-sans);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-inter);
+  --font-metric: var(--font-vt323);
 }
 
 html,
@@ -30,5 +36,5 @@ body {
 h1,
 h2,
 h3 {
-  font-family: var(--font-mono), ui-monospace, monospace;
+  font-family: var(--font-sans), system-ui, sans-serif;
 }

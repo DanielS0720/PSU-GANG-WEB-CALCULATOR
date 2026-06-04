@@ -20,7 +20,7 @@ export default function OpenGraphImage() {
           justifyContent: "center",
           padding: "80px",
           background: "#141414",
-          fontFamily: "monospace",
+          fontFamily: "sans-serif",
         }}
       >
         <div

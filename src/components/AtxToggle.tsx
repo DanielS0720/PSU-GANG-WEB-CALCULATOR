@@ -17,7 +17,7 @@ export function AtxToggle({ mode, onChange }: AtxToggleProps) {
       <span className="block text-xs uppercase tracking-widest text-[var(--color-muted)] mb-2">
         Estándar PSU
       </span>
-      <div className="inline-flex rounded-md border border-[var(--color-surface)] overflow-hidden font-mono text-sm">
+      <div className="inline-flex rounded-md border border-[var(--color-surface)] overflow-hidden text-sm">
         {OPTIONS.map((opt) => {
           const active = mode === opt.value;
           return (

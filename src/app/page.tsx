@@ -99,7 +99,7 @@ export default function Home() {
 
       <main className="flex-1">
         <div className="mx-auto w-full max-w-6xl px-6 py-10">
-          <h1 className="font-mono text-2xl font-semibold mb-1">
+          <h1 className="text-2xl font-semibold mb-1">
             Watt Calculator
           </h1>
           <p className="text-sm text-[var(--color-muted)] mb-8">
@@ -112,7 +112,7 @@ export default function Home() {
               href={SUPPORT_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-mono text-sm font-semibold text-[var(--color-accent)] underline underline-offset-4 hover:opacity-80"
+              className="text-sm font-semibold text-[var(--color-accent)] underline underline-offset-4 hover:opacity-80"
             >
               ¿Gustas apoyar el proyecto? Haz click aquí
             </a>
@@ -136,7 +136,7 @@ export default function Home() {
               </a>
             ))}
           </div>
-          <p className="text-center text-xs text-[var(--color-muted)] font-mono">
+          <p className="text-center text-xs text-[var(--color-muted)]">
             PSU Gang — sitio temporal
           </p>
         </div>
