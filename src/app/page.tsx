@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Calculator } from "@/components/Calculator";
+import { ResultScope } from "@/components/ResultScope";
 import {
   SITE_URL,
   SITE_NAME,
@@ -105,18 +105,20 @@ export default function Home() {
           <p className="text-sm text-[var(--color-muted)] mb-8">
             Selecciona tus componentes y obtén la potencia de fuente recomendada.
           </p>
-          <Calculator />
-
-          <div className="mt-10 text-center">
-            <a
-              href={SUPPORT_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm font-semibold text-[var(--color-accent)] underline underline-offset-4 hover:opacity-80"
-            >
-              ¿Gustas apoyar el proyecto? Haz click aquí
-            </a>
-          </div>
+          <ResultScope
+            supportSlot={
+              <div className="mt-10 text-center">
+                <a
+                  href={SUPPORT_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-semibold text-[var(--color-accent)] underline underline-offset-4 hover:opacity-80"
+                >
+                  ¿Gustas apoyar el proyecto? Haz click aquí
+                </a>
+              </div>
+            }
+          />
         </div>
       </main>
 

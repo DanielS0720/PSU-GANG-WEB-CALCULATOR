@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type {
   Cpu,
   Gpu,
@@ -20,7 +20,6 @@ import { CpuPicker } from "./CpuPicker";
 import { GpuPicker } from "./GpuPicker";
 import { PsuPicker } from "./PsuPicker";
 import { AdequacyAlert } from "./AdequacyAlert";
-import { FeaturedPsus } from "./FeaturedPsus";
 import cpusData from "@/data/cpus.json";
 import gpusData from "@/data/gpus.json";
 import motherboardsData from "@/data/motherboards.json";
@@ -62,7 +61,12 @@ const storageUnitOptions: SelectOption[] = storageUnits.map((u) => ({
   label: u.label,
 }));
 
-export function Calculator() {
+interface CalculatorProps {
+  /** Notifies the parent of the current result (null while editing/uncomputed). */
+  onResult?: (result: CalculationResult | null) => void;
+}
+
+export function Calculator({ onResult }: CalculatorProps) {
   // Draft = what the user is editing. The result is computed only when the
   // user presses "Calcular", so the ATX mode (and every other field) is
   // applied explicitly instead of live.
@@ -85,6 +89,12 @@ export function Calculator() {
   // calculate(), so it lives outside Selection and survives recalculation.
   const [psuModelId, setPsuModelId] = useState<string | null>(null);
   const selectedPsuModel = psuModels.find((m) => m.id === psuModelId) ?? null;
+
+  // Report the current result to the parent (which renders the featured PSUs
+  // section below the support link and handles the auto-scroll).
+  useEffect(() => {
+    onResult?.(result);
+  }, [result, onResult]);
 
   function patch(changes: Partial<Selection>) {
     // Editing the form invalidates the previous result until recomputed.
@@ -216,7 +226,6 @@ export function Calculator() {
   }
 
   return (
-    <>
     <div className="grid gap-8 md:grid-cols-[320px_minmax(0,1fr)_320px] md:items-start">
       {/* Breakdown — left of the form (left of the ATX buttons) */}
       <BreakdownCard result={result} />
@@ -482,7 +491,5 @@ export function Calculator() {
         )}
       </aside>
     </div>
-    {result && result.tier && <FeaturedPsus result={result} />}
-    </>
   );
 }
