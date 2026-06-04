@@ -1,0 +1,16 @@
+{
+  "units": [
+    { "id": "hdd", "label": "HDD", "rail": "12v", "w": 20 },
+    { "id": "ssd-sata", "label": "SSD SATA", "rail": "5v", "w": 8 },
+    {
+      "id": "nvme",
+      "label": "NVMe",
+      "rail": "3v3",
+      "subtypes": [
+        { "id": "pcie3", "label": "PCIe 3.0", "w": 8 },
+        { "id": "pcie4", "label": "PCIe 4.0", "w": 12 },
+        { "id": "pcie5", "label": "PCIe 5.0", "w": 15 }
+      ]
+    }
+  ]
+}

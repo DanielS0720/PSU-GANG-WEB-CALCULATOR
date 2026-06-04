@@ -1,6 +1,6 @@
 [
   { "id": "120mm-standard", "label": "120mm estándar", "w_per_unit": 1.88 },
   { "id": "140mm-standard", "label": "140mm estándar", "w_per_unit": 1.88 },
-  { "id": "120mm-rgb", "label": "120mm RGB", "w_per_unit": 3.44 },
-  { "id": "140mm-rgb", "label": "140mm RGB", "w_per_unit": 3.44 }
+  { "id": "120mm-rgb", "label": "120mm RGB", "w_per_unit": 3.44, "rgb_5v": 5 },
+  { "id": "140mm-rgb", "label": "140mm RGB", "w_per_unit": 3.44, "rgb_5v": 5 }
 ]
