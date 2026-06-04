@@ -22,7 +22,7 @@ export function BreakdownCard({ result }: BreakdownCardProps) {
   const rail12Lines = lines.filter((l) => l.v12 > 0);
 
   return (
-    <div className="mt-4 rounded-lg border border-[var(--color-surface)] bg-[var(--color-surface)] p-6">
+    <div className="rounded-lg border border-[var(--color-surface)] bg-[var(--color-surface)] p-6">
       <span className="block text-xs uppercase tracking-widest text-[var(--color-muted)] mb-3">
         Desglose de consumo (12V)
       </span>
@@ -49,36 +49,48 @@ export function BreakdownCard({ result }: BreakdownCardProps) {
       </button>
 
       {advanced && (
-        <div className="mt-3 border-t border-dashed border-[var(--color-muted)]/30 pt-3">
-          <table className="w-full border-collapse font-mono text-xs">
+        <div className="mt-3 border-t border-dashed border-[var(--color-muted)]/30 pt-3 overflow-x-auto">
+          <table className="w-full border-collapse font-mono text-sm">
             <thead>
-              <tr className="text-[var(--color-muted)]">
-                <th className="py-1 text-left font-normal">Componente</th>
-                <th className="py-1 text-right font-normal">12V</th>
-                <th className="py-1 text-right font-normal">5V</th>
-                <th className="py-1 text-right font-normal">3.3V</th>
+              <tr className="border-b border-[var(--color-muted)]/30">
+                <th className="py-2 pr-2 text-left font-medium text-[var(--color-muted)]">
+                  Componente
+                </th>
+                <th className="py-2 px-2 text-right font-semibold text-[var(--color-accent)]">
+                  12V
+                </th>
+                <th className="py-2 px-2 text-right font-semibold text-amber-400">5V</th>
+                <th className="py-2 pl-2 text-right font-semibold text-sky-400">3.3V</th>
               </tr>
             </thead>
             <tbody>
               {lines
                 .filter((l) => l.v12 > 0 || l.v5 > 0 || l.v3v3 > 0)
                 .map((l, i) => (
-                  <tr key={i} className="border-t border-[var(--color-bg)]/40">
-                    <td className="py-1 text-left text-[var(--color-muted)]">{l.label}</td>
-                    <td className="py-1 text-right">{l.v12 || "—"}</td>
-                    <td className="py-1 text-right">{l.v5 || "—"}</td>
-                    <td className="py-1 text-right">{l.v3v3 || "—"}</td>
+                  <tr key={i} className="border-t border-[var(--color-bg)]/50">
+                    <td className="py-2 pr-2 text-left text-[var(--color-text)]">{l.label}</td>
+                    <td className="py-2 px-2 text-right tabular-nums text-[var(--color-text)]">
+                      {l.v12 || <span className="text-[var(--color-muted)]/50">—</span>}
+                    </td>
+                    <td className="py-2 px-2 text-right tabular-nums text-[var(--color-text)]">
+                      {l.v5 || <span className="text-[var(--color-muted)]/50">—</span>}
+                    </td>
+                    <td className="py-2 pl-2 text-right tabular-nums text-[var(--color-text)]">
+                      {l.v3v3 || <span className="text-[var(--color-muted)]/50">—</span>}
+                    </td>
                   </tr>
                 ))}
-              <tr className="border-t border-[var(--color-muted)]/40 font-semibold text-[var(--color-text)]">
-                <td className="py-1 text-left">Total riel</td>
-                <td className="py-1 text-right">{rail12}</td>
-                <td className="py-1 text-right">{rail5}</td>
-                <td className="py-1 text-right">{rail3v3}</td>
+              <tr className="border-t-2 border-[var(--color-muted)]/40 font-semibold text-[var(--color-text)]">
+                <td className="py-2 pr-2 text-left">Total riel (W)</td>
+                <td className="py-2 px-2 text-right tabular-nums text-[var(--color-accent)]">
+                  {rail12}
+                </td>
+                <td className="py-2 px-2 text-right tabular-nums text-amber-400">{rail5}</td>
+                <td className="py-2 pl-2 text-right tabular-nums text-sky-400">{rail3v3}</td>
               </tr>
             </tbody>
           </table>
-          <p className="mt-2 font-mono text-[10px] text-[var(--color-muted)]">
+          <p className="mt-3 font-mono text-xs text-[var(--color-muted)]">
             5V y 3.3V son informativos — no cambian la fuente recomendada.
           </p>
         </div>

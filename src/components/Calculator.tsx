@@ -205,7 +205,8 @@ export function Calculator() {
   }
 
   return (
-    <div className="grid gap-8 md:grid-cols-[1fr_320px]">
+    <div className="space-y-8">
+      <div className="grid gap-8 md:grid-cols-[1fr_320px]">
       <section className="space-y-5">
         <AtxToggle mode={selection.mode} onChange={(mode) => patch({ mode })} />
 
@@ -440,23 +441,27 @@ export function Calculator() {
           <p className="font-mono text-xs text-red-400">{error}</p>
         )}
       </section>
+      </div>
 
-      <aside>
-        <ResultCard result={result} />
+      {/* Results row — breakdown (left) and recommended PSU (right) at the same height */}
+      <div className="grid gap-8 md:grid-cols-[1fr_320px] md:items-start">
         <BreakdownCard result={result} />
-        {result && (
-          <div className="mt-4 text-center">
-            <a
-              href={BUY_GUIDE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-mono text-sm font-semibold text-[var(--color-accent)] underline underline-offset-4 hover:opacity-80"
-            >
-              ¿Quieres saber qué fuente comprar?
-            </a>
-          </div>
-        )}
-      </aside>
+        <aside>
+          <ResultCard result={result} />
+          {result && (
+            <div className="mt-4 text-center">
+              <a
+                href={BUY_GUIDE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-sm font-semibold text-[var(--color-accent)] underline underline-offset-4 hover:opacity-80"
+              >
+                ¿Quieres saber qué fuente comprar?
+              </a>
+            </div>
+          )}
+        </aside>
+      </div>
     </div>
   );
 }
