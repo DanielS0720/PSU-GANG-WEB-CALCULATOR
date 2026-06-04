@@ -1,14 +1,8 @@
+# Cloudflare Pages — sitio estático.
+# next build (output: "export") genera ./out, que Pages sube.
+# Con pages_build_output_dir definido, el deploy command "npx wrangler pages
+# deploy" (sin argumentos) toma el directorio y el nombre de proyecto de aquí.
+# El dominio (psugang.com) se configura en el panel: Pages > Custom domains.
 name = "psugangcalculator"
 compatibility_date = "2024-09-23"
-
-# Solo servir en el dominio propio. Desactiva la URL *.workers.dev.
-workers_dev = false
-preview_urls = false
-routes = [
-  { pattern = "psugang.com", custom_domain = true },
-]
-
-# Sitio estático (next build con output: "export" -> ./out).
-# Se despliega como Workers static assets: wrangler deploy.
-[assets]
-directory = "./out"
+pages_build_output_dir = "out"
