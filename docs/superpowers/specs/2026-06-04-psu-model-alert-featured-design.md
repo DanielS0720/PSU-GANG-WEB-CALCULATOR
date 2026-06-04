@@ -37,17 +37,18 @@ New file `src/data/psu-models.json`, an array of:
 - `brand`, `model` — display strings.
 - `w` — rated wattage (integer).
 - `tier` — one of the existing tier ids in `tiers.json` (`tier-s` … `tier-f`).
-- `image` — optional path to a product image under `/public` (e.g.
+- `image` — `string | null`. Path to a product image under `/public` (e.g.
   `/psus/<id>.webp`), following the `/public/tiers` and `/public/logo`
-  convention. Absent/missing → a placeholder is shown.
+  convention. **Most models are `null`**; only a curated handful (~4 per tier,
+  ≈36 total) ship a real image. `null`/missing → a placeholder is shown.
 - `sponsorRank` — optional integer. Absent or `0` = normal placement. A value
   `> 0` marks a sponsored model that sorts ahead of non-sponsored ones; a lower
   positive rank sorts higher. This is the monetization lever — editing the JSON
   changes ordering without code changes.
 
-**Images.** Any model can surface as featured, so each eventually needs an
-image; this is a separate curation effort that does not block the code. Start
-with a shared placeholder and add real images (sponsored / popular first).
+**Images.** We do not store images for all ~700 models — only about 4 per tier
+(≈36 total). Every other model has `image: null` and renders the shared
+placeholder.
 
 New `PsuModel` interface in `src/types/components.ts`.
 
