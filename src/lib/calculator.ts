@@ -6,7 +6,10 @@ import type {
   Gpu,
   Motherboard,
   PsuStandard,
+  Rail,
   Selection,
+  StorageSelection,
+  StorageUnit,
   Tier,
   WattMode,
 } from "@/types/components";
@@ -16,6 +19,7 @@ import motherboardsData from "@/data/motherboards.json";
 import fansData from "@/data/fans.json";
 import coolersData from "@/data/coolers.json";
 import psusData from "@/data/psus.json";
+import storageData from "@/data/storage.json";
 import tiersData from "@/data/tiers.json";
 
 const cpus = cpusData as Cpu[];
@@ -24,6 +28,7 @@ const motherboards = motherboardsData as Motherboard[];
 const fans = fansData as Fan[];
 const coolers = coolersData as Cooler[];
 const psus = psusData as PsuStandard[];
+const storageUnits = storageData.units as StorageUnit[];
 const tiers = tiersData as Tier[];
 
 /** Extra watts added per enabled option (overclock, future proof). */
@@ -82,6 +87,49 @@ function findById<T extends { id: string }>(
 ): T | undefined {
   if (id === null) return undefined;
   return list.find((item) => item.id === id);
+}
+
+/** A resolved, non-empty storage row ready to add to a rail. */
+export interface ResolvedStorage {
+  label: string;
+  rail: Rail;
+  /** Total watts for the row: per-drive watt × count. */
+  watts: number;
+}
+
+/**
+ * Resolves one storage row to its rail contribution, or `null` when the row is
+ * empty/incomplete (no unit, NVMe without subtype, or count 0). Count is floored
+ * and clamped to 0–8.
+ */
+export function resolveStorage(sel: StorageSelection): ResolvedStorage | null {
+  const unit = storageUnits.find((u) => u.id === sel.unitId);
+  if (!unit) return null;
+  const count = Math.min(8, Math.max(0, Math.floor(sel.count)));
+  if (count === 0) return null;
+
+  let perUnit: number;
+  let label = unit.label;
+  if (unit.subtypes) {
+    const subtype = unit.subtypes.find((s) => s.id === sel.subtypeId);
+    if (!subtype) return null;
+    perUnit = subtype.w;
+    label = `${unit.label} ${subtype.label}`;
+  } else {
+    perUnit = unit.w ?? 0;
+  }
+  return { label: `${label} ×${count}`, rail: unit.rail, watts: perUnit * count };
+}
+
+/** 5V draw of an RGB fan row: `rgb_5v` per unit × count (0 when not RGB). */
+export function fanRgb5v(fan: Fan | undefined, count: number): number {
+  if (!fan?.rgb_5v) return 0;
+  return fan.rgb_5v * Math.max(0, Math.floor(count));
+}
+
+/** 5V draw of an RGB cooler (0 when not RGB). */
+export function coolerRgb5v(cooler: Cooler | undefined): number {
+  return cooler?.rgb_5v ?? 0;
 }
 
 /**
