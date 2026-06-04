@@ -30,17 +30,24 @@ Both features read from the same new dataset of real PSU models.
 New file `src/data/psu-models.json`, an array of:
 
 ```json
-{ "id": "corsair-rm850x", "brand": "Corsair", "model": "RM850x", "w": 850, "tier": "tier-a", "sponsorRank": 0 }
+{ "id": "corsair-rm850x", "brand": "Corsair", "model": "RM850x", "w": 850, "tier": "tier-a", "image": "/psus/corsair-rm850x.webp", "sponsorRank": 0 }
 ```
 
 - `id` — stable kebab-case slug (`<brand>-<model>`), unique.
 - `brand`, `model` — display strings.
 - `w` — rated wattage (integer).
 - `tier` — one of the existing tier ids in `tiers.json` (`tier-s` … `tier-f`).
+- `image` — optional path to a product image under `/public` (e.g.
+  `/psus/<id>.webp`), following the `/public/tiers` and `/public/logo`
+  convention. Absent/missing → a placeholder is shown.
 - `sponsorRank` — optional integer. Absent or `0` = normal placement. A value
   `> 0` marks a sponsored model that sorts ahead of non-sponsored ones; a lower
   positive rank sorts higher. This is the monetization lever — editing the JSON
   changes ordering without code changes.
+
+**Images.** Any model can surface as featured, so each eventually needs an
+image; this is a separate curation effort that does not block the code. Start
+with a shared placeholder and add real images (sponsored / popular first).
 
 New `PsuModel` interface in `src/types/components.ts`.
 
@@ -100,8 +107,8 @@ New section below `ResultCard`, shown only when a tier was computed.
    then by wattage closest to `wattBaseline` (ascending distance — avoids
    oversizing, matching the "660W build → prefer 650W, not bigger" rule).
 3. **Limit:** first 4.
-4. **Card:** brand + model, wattage, tier badge; a "Destacado" label when
-   `sponsorRank > 0`.
+4. **Card:** product image on top (placeholder when `image` is absent), then
+   brand + model, wattage, tier badge; a "Destacado" label when `sponsorRank > 0`.
 
 ## Edge cases
 
@@ -112,6 +119,7 @@ New section below `ResultCard`, shown only when a tier was computed.
   consumo").
 - User PSU model not selected → adequacy alert skipped entirely.
 - Model with an unknown `tier` id → ranks worst; never crashes the filter.
+- Model with no `image` → shared placeholder; layout unaffected.
 
 ## Testing
 
