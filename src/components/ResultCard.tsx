@@ -1,11 +1,11 @@
 import type { CalculationResult } from "@/lib/calculator";
+import { TierImage } from "./TierImage";
 
 interface ResultCardProps {
   result: CalculationResult | null;
 }
 
-// Recommended PSU card: standard wattage + calculated draw. The tier lives in
-// its own TierCard so both sit at the same height in the results row.
+// Recommended PSU + tier in a single card. Shown after the user presses Calcular.
 export function ResultCard({ result }: ResultCardProps) {
   if (!result) {
     return (
@@ -21,7 +21,7 @@ export function ResultCard({ result }: ResultCardProps) {
     );
   }
 
-  const { baseWatts, totalWatts, recommendedPsu } = result;
+  const { baseWatts, totalWatts, recommendedPsu, tier } = result;
   const extraWatts = totalWatts - baseWatts;
 
   return (
@@ -48,6 +48,21 @@ export function ResultCard({ result }: ResultCardProps) {
         Consumo calculado: {totalWatts} W
         {extraWatts > 0 && ` (${baseWatts} W base + ${extraWatts} W extras)`}
       </p>
+
+      <div className="mt-6 mx-auto w-full max-w-[260px]">
+        {tier ? (
+          <>
+            <TierImage src={tier.image} alt={tier.label} />
+            <p className="mt-3 font-mono text-sm text-[var(--color-muted)]">
+              {tier.label}
+            </p>
+          </>
+        ) : (
+          <div className="aspect-square rounded-md border border-dashed border-[var(--color-muted)]/40 flex items-center justify-center text-xs text-[var(--color-muted)]">
+            Sin tier asignado
+          </div>
+        )}
+      </div>
     </div>
   );
 }

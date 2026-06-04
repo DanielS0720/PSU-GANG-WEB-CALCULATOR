@@ -14,7 +14,6 @@ import { calculate, type CalculationResult } from "@/lib/calculator";
 import { AtxToggle } from "./AtxToggle";
 import { ComponentSelect, type SelectOption } from "./ComponentSelect";
 import { ResultCard } from "./ResultCard";
-import { TierCard } from "./TierCard";
 import { BreakdownCard } from "./BreakdownCard";
 import { CpuPicker } from "./CpuPicker";
 import { GpuPicker } from "./GpuPicker";
@@ -206,7 +205,10 @@ export function Calculator() {
   }
 
   return (
-    <div className="grid gap-8 md:grid-cols-2 md:items-start">
+    <div className="grid gap-8 md:grid-cols-[1fr_1fr_300px] md:items-start">
+      {/* Breakdown — left of the form (left of the ATX buttons) */}
+      <BreakdownCard result={result} />
+
       <section className="space-y-5">
         <AtxToggle mode={selection.mode} onChange={(mode) => patch({ mode })} />
 
@@ -442,15 +444,11 @@ export function Calculator() {
         )}
       </section>
 
-      {/* Results column — top-aligned with the form; PSU + Tier side by side, breakdown below */}
-      <aside className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <ResultCard result={result} />
-          <TierCard result={result} />
-        </div>
-        <BreakdownCard result={result} />
+      {/* Recommended PSU + tier (single card), right column, top-aligned with the form */}
+      <aside>
+        <ResultCard result={result} />
         {result && (
-          <div className="mt-2 text-center">
+          <div className="mt-4 text-center">
             <a
               href={BUY_GUIDE_URL}
               target="_blank"
