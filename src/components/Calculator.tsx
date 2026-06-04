@@ -9,6 +9,7 @@ import type {
   Cooler,
   Selection,
   StorageUnit,
+  PsuModel,
 } from "@/types/components";
 import { calculate, type CalculationResult } from "@/lib/calculator";
 import { AtxToggle } from "./AtxToggle";
@@ -17,18 +18,23 @@ import { ResultCard } from "./ResultCard";
 import { BreakdownCard } from "./BreakdownCard";
 import { CpuPicker } from "./CpuPicker";
 import { GpuPicker } from "./GpuPicker";
+import { PsuPicker } from "./PsuPicker";
+import { AdequacyAlert } from "./AdequacyAlert";
+import { FeaturedPsus } from "./FeaturedPsus";
 import cpusData from "@/data/cpus.json";
 import gpusData from "@/data/gpus.json";
 import motherboardsData from "@/data/motherboards.json";
 import fansData from "@/data/fans.json";
 import coolersData from "@/data/coolers.json";
 import storageData from "@/data/storage.json";
+import psuModelsData from "@/data/psu-models.json";
 
 const cpus = cpusData as Cpu[];
 const gpus = gpusData as Gpu[];
 const motherboards = motherboardsData as Motherboard[];
 const fans = fansData as Fan[];
 const coolers = coolersData as Cooler[];
+const psuModels = psuModelsData as PsuModel[];
 
 // Enlace guía de compra
 const BUY_GUIDE_URL =
@@ -74,6 +80,11 @@ export function Calculator() {
 
   const [result, setResult] = useState<CalculationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // The user's own PSU model, used for the adequacy alert. It does NOT feed
+  // calculate(), so it lives outside Selection and survives recalculation.
+  const [psuModelId, setPsuModelId] = useState<string | null>(null);
+  const selectedPsuModel = psuModels.find((m) => m.id === psuModelId) ?? null;
 
   function patch(changes: Partial<Selection>) {
     // Editing the form invalidates the previous result until recomputed.
@@ -205,6 +216,7 @@ export function Calculator() {
   }
 
   return (
+    <>
     <div className="grid gap-8 md:grid-cols-[320px_minmax(0,1fr)_320px] md:items-start">
       {/* Breakdown — left of the form (left of the ATX buttons) */}
       <BreakdownCard result={result} />
@@ -432,6 +444,12 @@ export function Calculator() {
           </label>
         </fieldset>
 
+        <PsuPicker
+          models={psuModels}
+          value={psuModelId}
+          onChange={setPsuModelId}
+        />
+
         <button
           type="button"
           onClick={handleCalculate}
@@ -447,6 +465,9 @@ export function Calculator() {
       {/* Recommended PSU + tier (single card), right column, top-aligned with the form */}
       <aside>
         <ResultCard result={result} />
+        {result && result.tier && selectedPsuModel && (
+          <AdequacyAlert model={selectedPsuModel} result={result} />
+        )}
         {result && (
           <div className="mt-4 text-center">
             <a
@@ -461,5 +482,7 @@ export function Calculator() {
         )}
       </aside>
     </div>
+    {result && result.tier && <FeaturedPsus result={result} />}
+    </>
   );
 }
