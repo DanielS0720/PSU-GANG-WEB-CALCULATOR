@@ -4,14 +4,14 @@
     "label": "Intel Z890",
     "chipset": "Z890",
     "socket": "LGA1851",
-    "avg_w": 50
+    "avg_w": 100
   },
     {
     "id": "b860",
     "label": "Intel B860",
     "chipset": "B860",
     "socket": "LGA1851",
-    "avg_w": 46
+    "avg_w": 66
   },
   {
     "id": "h810",
@@ -25,28 +25,28 @@
     "label": "Intel Z790",
     "chipset": "Z790",
     "socket": "LGA 1700",
-    "avg_w": 46
+    "avg_w": 72
   },
   {
     "id": "b760",
     "label": "Intel B760",
     "chipset": "B760",
     "socket": "LGA 1700",
-    "avg_w": 40
+    "avg_w": 60
   },
   {
     "id": "z690",
     "label": "Intel Z690",
     "chipset": "Z690",
     "socket": "LGA 1700",
-    "avg_w": 46
+    "avg_w": 72
   },
   {
     "id": "b660",
     "label": "Intel B660",
     "chipset": "B660",
     "socket": "LGA 1700",
-    "avg_w": 40
+    "avg_w": 60
   },
   {
     "id": "h610",
@@ -60,14 +60,14 @@
     "label": "Intel Z590",
     "chipset": "Z590",
     "socket": "LGA 1200",
-    "avg_w": 46
+    "avg_w": 72
   },
   {
     "id": "b560",
     "label": "Intel B560",
     "chipset": "B560",
     "socket": "LGA 1200",
-    "avg_w": 40
+    "avg_w": 60
   },
   {
     "id": "h510",
@@ -81,49 +81,49 @@
     "label": "AMD X870E",
     "chipset": "X870E",
     "socket": "AM5",
-    "avg_w": 40
+    "avg_w": 80
   },
   {
     "id": "x870",
     "label": "AMD X870",
     "chipset": "X870",
     "socket": "AM5",
-    "avg_w": 35
+    "avg_w": 70
   },
   {
     "id": "b850",
     "label": "AMD B850",
     "chipset": "B850",
     "socket": "AM5",
-    "avg_w": 30
+    "avg_w": 60
   },
   {
     "id": "x670e",
     "label": "AMD X670E",
     "chipset": "X670E",
     "socket": "AM5",
-    "avg_w": 37
+    "avg_w": 74
   },
   {
     "id": "x670",
     "label": "AMD X670",
     "chipset": "X670",
     "socket": "AM5",
-    "avg_w": 35
+    "avg_w": 70
   },
   {
     "id": "b650e",
     "label": "AMD B650E",
     "chipset": "B650E",
     "socket": "AM5",
-    "avg_w": 30
+    "avg_w": 50
   },
   {
     "id": "b650",
     "label": "AMD B650",
     "chipset": "B650",
     "socket": "AM5",
-    "avg_w": 30
+    "avg_w": 50
   },
   {
     "id": "a620",
@@ -137,21 +137,21 @@
     "label": "AMD B840",
     "chipset": "B840",
     "socket": "AM5",
-    "avg_w": 30
+    "avg_w": 50
   },
   {
     "id": "X570",
     "label": "AMD X570",
     "chipset": "X570",
     "socket": "AM4",
-    "avg_w": 37
+    "avg_w": 74
   },
   {
     "id": "b550",
     "label": "AMD B550",
     "chipset": "B550",
     "socket": "AM4",
-    "avg_w": 30
+    "avg_w": 50
   },
   {
     "id": "a520",
@@ -165,28 +165,28 @@
     "label": "AMD X470",
     "chipset": "X470",
     "socket": "AM4",
-    "avg_w": 37
+    "avg_w": 74
   },
   {
     "id": "b450",
     "label": "AMD B450",
     "chipset": "B450",
     "socket": "AM4",
-    "avg_w": 30
+    "avg_w": 50
   },
   {
     "id": "x370",
     "label": "AMD X370",
     "chipset": "X370",
     "socket": "AM4",
-    "avg_w": 37
+    "avg_w": 74
   },
   {
     "id": "b350",
     "label": "AMD B350",
     "chipset": "B350",
     "socket": "AM4",
-    "avg_w": 30
+    "avg_w": 50
   },
   {
     "id": "a320",
