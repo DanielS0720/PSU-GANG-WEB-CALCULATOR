@@ -13,6 +13,11 @@ export function normalize(str: string): string {
 /**
  * True when `query` appears as a contiguous substring of `searchText`,
  * both normalized. Empty query matches everything.
+ *
+ * Pickers build `searchText` as `brand model family` so brand and model are
+ * adjacent: that lets "AMD Ryzen" match across to the model while keeping a
+ * tier like "AMD Ryzen 5" from matching "AMD Ryzen 7 ...". The trailing family
+ * still enables series search (e.g. "RTX 50").
  */
 export function matches(searchText: string, query: string): boolean {
   const q = normalize(query);

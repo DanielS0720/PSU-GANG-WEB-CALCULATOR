@@ -33,7 +33,7 @@ export function GpuPicker({ gpus, index, value, onChange }: GpuPickerProps) {
         .map((g) => ({
           value: g.id,
           label: `${g.brand} ${g.model}`,
-          searchText: `${g.brand} ${g.family} ${g.model}`,
+          searchText: `${g.brand} ${g.model} ${g.family}`,
         })),
     [gpus, brand],
   );

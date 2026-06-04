@@ -262,16 +262,17 @@ export function Calculator() {
                     Cantidad
                   </span>
                   <input
-                    type="number"
-                    min={0}
-                    max={MAX_FANS}
-                    value={row.count}
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="0"
+                    // Empty while 0 so the default zero clears on the first
+                    // keystroke instead of leaving a leading zero (e.g. "01").
+                    value={row.count === 0 ? "" : String(row.count)}
                     onChange={(e) => {
-                      const n = Number(e.target.value);
-                      const clamped = Number.isNaN(n)
-                        ? 0
-                        : Math.min(MAX_FANS, Math.max(0, Math.floor(n)));
-                      setFanCountAt(i, clamped);
+                      // Digits only, capped at two; then clamp to the max.
+                      const digits = e.target.value.replace(/\D/g, "").slice(0, 2);
+                      const n = digits === "" ? 0 : Number(digits);
+                      setFanCountAt(i, Math.min(MAX_FANS, n));
                     }}
                     className="w-full rounded-md border border-[var(--color-surface)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text)] focus:border-[var(--color-accent)] focus:outline-none"
                   />

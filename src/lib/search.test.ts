@@ -11,11 +11,12 @@ describe("normalize", () => {
 });
 
 describe("matches", () => {
-  const rtx5090 = "Nvidia RTX 50 RTX 5090";
-  const rtx5080 = "Nvidia RTX 50 RTX 5080";
-  const rtx4090 = "Nvidia RTX 40 RTX 4090";
-  const rtx3050 = "Nvidia RTX 30 RTX 3050";
-  const ryzen7700 = "AMD Zen 4 Ryzen 7 7700";
+  // searchText is built as `brand model family` (see CpuPicker/GpuPicker).
+  const rtx5090 = "Nvidia RTX 5090 RTX 50";
+  const rtx5080 = "Nvidia RTX 5080 RTX 50";
+  const rtx4090 = "Nvidia RTX 4090 RTX 40";
+  const rtx3050 = "Nvidia RTX 3050 RTX 30";
+  const ryzen7700 = "AMD Ryzen 7 7700 Zen 4";
 
   it("RTX 50 matches the 50-series", () => {
     expect(matches(rtx5090, "RTX 50")).toBe(true);
@@ -27,6 +28,18 @@ describe("matches", () => {
   });
   it("matches by model number fragment", () => {
     expect(matches(ryzen7700, "7700")).toBe(true);
+  });
+  it("matches a query spanning brand into model (brand+model adjacency)", () => {
+    expect(matches(ryzen7700, "AMD Ryzen")).toBe(true);
+    expect(matches("Nvidia RTX 2060 RTX 20", "RTX 2060")).toBe(true);
+  });
+  it("a tier query excludes other tiers", () => {
+    const r5 = "AMD Ryzen 5 5600X Zen 3";
+    const r7 = "AMD Ryzen 7 5800X Zen 3";
+    const r9 = "AMD Ryzen 9 5900X Zen 3";
+    expect(matches(r5, "AMD Ryzen 5")).toBe(true);
+    expect(matches(r7, "AMD Ryzen 5")).toBe(false);
+    expect(matches(r9, "AMD Ryzen 5")).toBe(false);
   });
   it("is case- and accent-insensitive", () => {
     expect(matches("AMD ÁRC", "arc")).toBe(true);

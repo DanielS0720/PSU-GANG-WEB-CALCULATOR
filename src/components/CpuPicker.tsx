@@ -60,7 +60,7 @@ export function CpuPicker({
         .map((c) => ({
           value: c.id,
           label: `${c.brand} ${c.model}`,
-          searchText: `${c.brand} ${c.family} ${c.model}`,
+          searchText: `${c.brand} ${c.model} ${c.family}`,
         })),
     [cpus, brand, socket],
   );
