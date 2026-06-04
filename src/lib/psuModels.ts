@@ -49,3 +49,37 @@ export function checkPsuAdequacy(
     wattsOk: model.w >= wattBaseline(result),
   };
 }
+
+/** Sponsored models sort by ascending positive rank; non-sponsored sort last. */
+function sponsorKey(m: PsuModel): number {
+  return m.sponsorRank && m.sponsorRank > 0 ? m.sponsorRank : Infinity;
+}
+
+/**
+ * Up to `limit` PSU models compatible with the build (quality tier equal-or-
+ * better AND wattage at or above the baseline), sponsored first, then by
+ * wattage closest to the baseline (avoids oversizing). Empty when the build has
+ * no tier or nothing is compatible. `models` is injected for testability.
+ */
+export function featuredPsus(
+  result: CalculationResult,
+  models: PsuModel[],
+  limit = 4,
+): PsuModel[] {
+  if (!result.tier) return [];
+  const requiredRank = tierRank(result.tier.id);
+  const baseline = wattBaseline(result);
+
+  const compatible = models.filter(
+    (m) => tierRank(m.tier) <= requiredRank && m.w >= baseline,
+  );
+
+  return [...compatible]
+    .sort((a, b) => {
+      const sa = sponsorKey(a);
+      const sb = sponsorKey(b);
+      if (sa !== sb) return sa - sb;
+      return Math.abs(a.w - baseline) - Math.abs(b.w - baseline);
+    })
+    .slice(0, limit);
+}

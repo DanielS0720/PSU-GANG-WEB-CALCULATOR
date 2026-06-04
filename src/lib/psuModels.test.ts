@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { tierRank, tierLabel, wattBaseline, checkPsuAdequacy } from "./psuModels";
+import { tierRank, tierLabel, wattBaseline, checkPsuAdequacy, featuredPsus } from "./psuModels";
 import type { CalculationResult } from "./calculator";
 import type { PsuModel, PsuStandard, Tier } from "@/types/components";
 
@@ -104,5 +104,69 @@ describe("checkPsuAdequacy", () => {
       totalWatts: 600,
     });
     expect(checkPsuAdequacy(model({ tier: "tier-f" }), noTier).tierOk).toBe(true);
+  });
+});
+
+describe("featuredPsus", () => {
+  const result = makeResult({
+    tier: tierATier, // required rank = tier-a
+    recommendedPsu: { w: 650, requires_220v: false }, // baseline 650
+    totalWatts: 660,
+  });
+
+  const models: PsuModel[] = [
+    model({ id: "too-weak-watts", tier: "tier-s", w: 600 }),       // excluded: < 650
+    model({ id: "too-weak-tier", tier: "tier-c", w: 850 }),        // excluded: worse than tier-a
+    model({ id: "plain-700", tier: "tier-a", w: 700 }),            // compatible, dist 50
+    model({ id: "plain-650", tier: "tier-s", w: 650 }),            // compatible, dist 0
+    model({ id: "plain-900", tier: "tier-a", w: 900 }),            // compatible, dist 250
+    model({ id: "sponsor-800", tier: "tier-a", w: 800, sponsorRank: 1 }), // sponsored
+  ];
+
+  it("returns only compatible models", () => {
+    const ids = featuredPsus(result, models).map((m) => m.id);
+    expect(ids).not.toContain("too-weak-watts");
+    expect(ids).not.toContain("too-weak-tier");
+  });
+
+  it("lists sponsored first, then closest wattage to the baseline", () => {
+    expect(featuredPsus(result, models).map((m) => m.id)).toEqual([
+      "sponsor-800", // sponsored wins regardless of distance
+      "plain-650",   // dist 0
+      "plain-700",   // dist 50
+      "plain-900",   // dist 250
+    ]);
+  });
+
+  it("honors the limit", () => {
+    expect(featuredPsus(result, models, 2).map((m) => m.id)).toEqual([
+      "sponsor-800",
+      "plain-650",
+    ]);
+  });
+
+  it("returns [] when the build has no tier (even if models would otherwise be compatible)", () => {
+    const noTier = makeResult({
+      tier: null,
+      recommendedPsu: { w: 650, requires_220v: false },
+      totalWatts: 660,
+    });
+    expect(featuredPsus(noTier, models)).toEqual([]);
+  });
+
+  it("returns [] when nothing is compatible", () => {
+    const tiny = [model({ id: "tiny", tier: "tier-f", w: 300 })];
+    expect(featuredPsus(result, tiny)).toEqual([]);
+  });
+
+  it("orders multiple sponsored models by ascending sponsorRank", () => {
+    const sponsored: PsuModel[] = [
+      model({ id: "sponsor-2", tier: "tier-a", w: 700, sponsorRank: 2 }),
+      model({ id: "sponsor-1", tier: "tier-a", w: 900, sponsorRank: 1 }),
+    ];
+    expect(featuredPsus(result, sponsored).map((m) => m.id)).toEqual([
+      "sponsor-1", // rank 1 before rank 2, regardless of wattage distance
+      "sponsor-2",
+    ]);
   });
 });
