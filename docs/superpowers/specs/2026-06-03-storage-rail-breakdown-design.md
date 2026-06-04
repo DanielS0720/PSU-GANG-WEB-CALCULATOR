@@ -35,14 +35,11 @@ El tier sigue siendo función de CPU+GPU únicamente.
 | SSD SATA | 8 | 5V |
 | NVMe PCIe 3.0 | 8 | 3.3V |
 | NVMe PCIe 4.0 | 12 | 3.3V |
-| NVMe PCIe 5.0 | 5.15 | 3.3V |
+| NVMe PCIe 5.0 | 15 | 3.3V |
 | RGB por ventilador | 5 | 5V |
 | RGB disipador — torre simple / AIO 120/140 | 5 | 5V |
 | RGB disipador — torre doble / AIO 240/280 | 10 | 5V |
 | RGB disipador — AIO 360/420 | 15 | 5V |
-
-> ⚠️ A confirmar: NVMe PCIe 5.0 = **5.15 W** queda por debajo de 4.0 (12 W). Valor
-> dado por el usuario; verificar que no sea typo antes de implementar.
 
 ## Modelo de datos
 
@@ -60,7 +57,7 @@ tiene subtipos.
       "subtypes": [
         { "id": "pcie3", "label": "PCIe 3.0", "w": 8 },
         { "id": "pcie4", "label": "PCIe 4.0", "w": 12 },
-        { "id": "pcie5", "label": "PCIe 5.0", "w": 5.15 }
+        { "id": "pcie5", "label": "PCIe 5.0", "w": 15 }
       ]
     }
   ]
@@ -158,7 +155,7 @@ En el `<aside>` derecho, debajo de `ResultCard`. Visible solo cuando hay `result
 
 - HDD suma a 12V y **sí** afecta `recommendedPsu`.
 - SSD/NVMe/RGB suman a 5V/3.3V y **no** afectan `recommendedPsu` ni `tier`.
-- Watts por subtipo NVMe correctos (3.0=8, 4.0=12, 5.0=5.15).
+- Watts por subtipo NVMe correctos (3.0=8, 4.0=12, 5.0=15).
 - `rgb_5v`: ventilador RGB ×N = 5·N en 5V; disipador RGB por tamaño (5/10/15).
 - Entrada no-RGB → 0 en 5V.
 - Filas vacías / NVMe sin subtipo → 0.
