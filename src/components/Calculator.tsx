@@ -37,7 +37,7 @@ const psuModels = psuModelsData as PsuModel[];
 
 // Enlace guía de compra
 const BUY_GUIDE_URL =
-  "https://docs.google.com/document/d/1iYZZeiiHBoXyctOdptDJ2oFYJ03mYiyT3XrXqXJIIQ8/edit?usp=sharing";
+  "https://drive.google.com/drive/folders/1u7HyXLMm1tRVaQpQf5b5sB5m-HiomqQR";
 
 const MAX_FANS = 15;
 const MAX_GPUS = 4;

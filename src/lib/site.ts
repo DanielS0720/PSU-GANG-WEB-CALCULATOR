@@ -18,5 +18,5 @@ export const SOCIAL_URLS = [
   "https://www.facebook.com/PSUG4ng",
   "https://www.instagram.com/psugangts/",
   "https://www.tiktok.com/@psugang",
-  "https://www.youtube.com/@PSUGANG-bx5hn",
+  "https://www.youtube.com/@PSUG4NG",
 ];
