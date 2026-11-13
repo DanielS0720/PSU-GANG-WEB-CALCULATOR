@@ -33,6 +33,7 @@ fuente de poder (PSU) adecuada. Sitio: ${SITE_URL}
 ## Fuente recomendada (wattaje estándar)
 - Escalones reales: 110V → 450, 550, 650, 750, 850, 1000, 1200, 1300, 1500, 1600; alto voltaje (requieren instalación 220V/230V) → 2000, 2200, 3000, 5200.
 - Regla de tolerancia 5%: se recomienda el primer escalón S (ascendente) donde consumoTotal ≤ S × 1.05. Ejemplo: 570W → 550W (porque 570 ≤ 577.5).
+- Tope de picos de 180% (solo ATX 3.x): los picos (peak_w de CPU y GPU, más el resto de la build y los extras) no pueden superar 180% de la potencia de la fuente, porque los picos se miden a 1 ms. Si lo superan, se sube de escalón. Ejemplo: una build de 463W (TDP) con picos de 896W pasa de 450W a 550W. En ATX 2.52 no aplica, porque el consumo ya usa picos.
 - Si el consumo supera 5200W × 1.05 (5460W), no hay escalón y se indica que excede el estándar.
 - La fuente recomendada es independiente del tier; son dos salidas distintas.
 

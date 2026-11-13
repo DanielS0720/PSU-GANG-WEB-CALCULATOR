@@ -8,6 +8,7 @@ function makeResult(over: Partial<CalculationResult>): CalculationResult {
   return {
     baseWatts: 0,
     totalWatts: 0,
+    transientWatts: 0,
     recommendedPsu: null,
     tier: null,
     breakdown: { rail12: 0, rail5: 0, rail3v3: 0, lines: [] },
