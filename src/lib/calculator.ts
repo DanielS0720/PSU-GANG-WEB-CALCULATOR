@@ -40,6 +40,14 @@ export const OPTION_WATTS = 100;
  */
 export const PSU_TOLERANCE = 1.05;
 
+/**
+ * Maximum transient peak over a standard PSU's rated wattage (180%). Uses the
+ * ATX 3.x upper-tier 1 ms limit, because the peak values in the dataset are
+ * measured at 1 ms. Units at or below 450 W, or without a 12VHPWR / 12V-2x6
+ * connector, have a lower 1 ms limit (145%) that this cap does not cover.
+ */
+export const TRANSIENT_CAP = 1.8;
+
 /** One row of the consumption breakdown, split across rails. */
 export interface BreakdownLine {
   label: string;
@@ -61,6 +69,12 @@ export interface CalculationResult {
   baseWatts: number;
   /** Total build draw — base draw plus enabled extras (the raw sum shown). */
   totalWatts: number;
+  /**
+   * Transient draw: the same components at their peak_w (CPU and GPU), plus
+   * enabled extras. Equals totalWatts in ATX 2.52 mode. Caps the recommended
+   * PSU at TRANSIENT_CAP x wattage, together with totalWatts.
+   */
+  transientWatts: number;
   /** Recommended standard PSU. `null` when the draw exceeds the top step. */
   recommendedPsu: PsuStandard | null;
   /** Tier from the CPU + GPU load. Extras never change the tier. */
@@ -70,12 +84,23 @@ export interface CalculationResult {
 }
 
 /**
- * Lowest standard PSU that covers `totalWatts` within the 5% tolerance, i.e.
- * the first step (ascending) where `totalWatts <= step.w * 1.05`. Returns
- * `null` when the draw exceeds even the largest step plus tolerance.
+ * Lowest standard PSU that satisfies both limits, checked in ascending order:
+ *   totalWatts     <= step.w * PSU_TOLERANCE  (sustained draw, 5% tolerance)
+ *   transientWatts <= step.w * TRANSIENT_CAP  (peaks at 1 ms, max 180%)
+ * Returns `null` when no step satisfies both. `transientWatts` defaults to
+ * `totalWatts`, so single-argument calls apply only the tolerance.
  */
-export function recommendPsu(totalWatts: number): PsuStandard | null {
-  return psus.find((psu) => totalWatts <= psu.w * PSU_TOLERANCE) ?? null;
+export function recommendPsu(
+  totalWatts: number,
+  transientWatts: number = totalWatts,
+): PsuStandard | null {
+  return (
+    psus.find(
+      (psu) =>
+        totalWatts <= psu.w * PSU_TOLERANCE &&
+        transientWatts <= psu.w * TRANSIENT_CAP,
+    ) ?? null
+  );
 }
 
 /** Maps the ATX standard to which watt field of a component to use. */
@@ -174,6 +199,8 @@ export function tierForLoads(cpuLoad: number, gpuLoad: number): Tier | null {
  *   baseWatts  = cpu[mode] + Σ gpu[mode] + mobo.avg_w + cooler.w + Σ (fan.w_per_unit * count)
  *   mode       = "peak_w" if ATX 2.52 or below, "tdp_w" if ATX 3.x (peak fallback)
  *   totalWatts = baseWatts + 100 per enabled extra (overclock / future proof)
+ *   transientWatts = ceil(same sum with peak_w for CPU and GPU) + extras
+ *   recommended    = first step S with totalWatts <= S*1.05 AND transientWatts <= S*1.8
  *
  * The tier is derived from the CPU + GPU transient peak (peak_w, always — never
  * the ATX-mode watt field) via tierForLoads. Overclock / future proof change the
@@ -267,12 +294,19 @@ export function calculate(selection: Selection): CalculationResult {
     lines.push({ label: "Extras (OC/FP)", v12: optionWatts, v5: 0, v3v3: 0 });
   }
 
+  // Transient draw: the same 12V components at their peak values (CPU and GPU
+  // peak_w, rest unchanged), plus extras. Equals totalWatts in ATX 2.52 mode.
+  const transientWatts =
+    Math.ceil(cpuPeak + gpuPeak + moboWatts + coolerWatts + fanWatts + storage12) +
+    optionWatts;
+
   // Tier is driven by the CPU + GPU transient peak (peak_w) only, never by the
   // ATX-mode watt field, the recommended wattage, or the OC / future-proof extras.
   return {
     baseWatts,
     totalWatts,
-    recommendedPsu: recommendPsu(totalWatts),
+    transientWatts,
+    recommendedPsu: recommendPsu(totalWatts, transientWatts),
     tier: tierForLoads(cpuPeak, gpuPeak),
     breakdown: { rail12: totalWatts, rail5, rail3v3, lines },
   };

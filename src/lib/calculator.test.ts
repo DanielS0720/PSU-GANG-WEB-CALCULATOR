@@ -1,5 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { resolveStorage, fanRgb5v, coolerRgb5v, calculate } from "./calculator";
+import {
+  resolveStorage,
+  fanRgb5v,
+  coolerRgb5v,
+  calculate,
+  recommendPsu,
+  TRANSIENT_CAP,
+} from "./calculator";
 import type { Cooler, Cpu, Fan, Gpu, Selection } from "@/types/components";
 import cpusData from "@/data/cpus.json";
 import gpusData from "@/data/gpus.json";
@@ -139,5 +146,74 @@ describe("calculate — per-rail breakdown", () => {
     expect(oc.breakdown.lines).toContainEqual(
       expect.objectContaining({ label: "Extras (OC/FP)", v12: 100, v5: 0, v3v3: 0 }),
     );
+  });
+});
+
+describe("recommendPsu — transient cap (180%)", () => {
+  it("without transientWatts only the 5% tolerance applies", () => {
+    expect(recommendPsu(570)?.w).toBe(550);
+    expect(recommendPsu(580)?.w).toBe(650);
+  });
+
+  it("moves up one step when peaks exceed 180% of the PSU", () => {
+    // 540 W fits 550 W with tolerance, but 1000 W > 550 * 1.8 = 990 W
+    expect(recommendPsu(540, 1000)?.w).toBe(650);
+  });
+
+  it("keeps the step when peaks fit within 180%", () => {
+    expect(recommendPsu(540, 985)?.w).toBe(550);
+  });
+});
+
+describe("calculate — transient cap", () => {
+  // Real build where the cap changes the answer: 450 W by tolerance, 550 W by peaks.
+  const capBuild = baseSelection({
+    mode: "atx-3",
+    cpuId: "core-i9-14900k",
+    gpuIds: ["rx-9060xt"],
+    motherboardId: "b650",
+  });
+
+  it("raises the ATX 3.x recommendation from 450 W to 550 W", () => {
+    const r = calculate(capBuild);
+    expect(r.totalWatts).toBe(463);
+    expect(r.transientWatts).toBe(896);
+    expect(r.recommendedPsu?.w).toBe(550);
+  });
+
+  it("ATX 2.52 sizes by peaks, so the cap never changes the result there", () => {
+    const r = calculate({ ...capBuild, mode: "atx-2" });
+    expect(r.transientWatts).toBe(r.totalWatts);
+    expect(r.recommendedPsu?.w).toBe(1000);
+  });
+
+  it("no CPU x GPU pair exceeds 180% of the recommended ATX 3.x PSU", () => {
+    let nulls = 0;
+    let violations = 0;
+    for (const cpu of cpus) {
+      for (const gpu of gpus) {
+        const r = calculate(
+          baseSelection({ mode: "atx-3", cpuId: cpu.id, gpuIds: [gpu.id], motherboardId: "a320" }),
+        );
+        if (!r.recommendedPsu) {
+          nulls++;
+        } else if (r.transientWatts > r.recommendedPsu.w * TRANSIENT_CAP) {
+          violations++;
+        }
+      }
+    }
+    expect(nulls).toBe(0);
+    expect(violations).toBe(0);
+  });
+
+  it("transientWatts equals totalWatts in ATX 2.52 for every CPU x GPU pair", () => {
+    for (const cpu of cpus) {
+      for (const gpu of gpus) {
+        const r = calculate(
+          baseSelection({ mode: "atx-2", cpuId: cpu.id, gpuIds: [gpu.id], motherboardId: "a320" }),
+        );
+        expect(r.transientWatts).toBe(r.totalWatts);
+      }
+    }
   });
 });
